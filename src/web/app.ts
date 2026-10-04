@@ -17,6 +17,10 @@ const LEVEL_COLOURS: Record<ConnectivityLevel, string> = {
   Unknown: "#b7beca",
 };
 
+const LEGEND = `<p class="legend">${Object.entries(LEVEL_COLOURS)
+  .map(([level, colour]) => `<span><i style="background:${colour}"></i>${level}</span>`)
+  .join("")}</p>`;
+
 /** Finds the prepared data of a train on a date, if there is any. */
 export type TrainLoader = (trainNumber: string, date: string) => Promise<PreparedTrain | undefined>;
 
@@ -29,7 +33,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
   </header>
   <form id="request" class="card">
     <div class="fields">
-      <label class="field"><span>Train number</span><input id="train" name="train" placeholder="6111" inputmode="numeric" autocomplete="off" required /></label>
+      <label class="field"><span>Train number</span><input id="train" name="train" placeholder="e.g. 6111" inputmode="numeric" autocomplete="off" required /></label>
       <label class="field"><span>Date</span><input id="date" name="date" value="${formatFrenchDate(today)}" placeholder="dd/mm/yyyy" inputmode="numeric" required /></label>
       <button>Show coverage</button>
     </div>
@@ -42,11 +46,6 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     </fieldset>
   </form>
   <p id="message" role="status"></p>
-  <p class="legend">
-    ${Object.entries(LEVEL_COLOURS)
-      .map(([level, colour]) => `<span><i style="background:${colour}"></i>${level}</span>`)
-      .join("")}
-  </p>
   <div id="line"></div>
 `;
 
@@ -61,7 +60,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     const operator = String(new FormData(form).get("operator")) as Operator;
     const lengthKm = Math.round(shown.stops.at(-1)?.atKm ?? 0);
     message.textContent = `Train ${shown.trainNumber} on ${formatFrenchDate(shown.date)} with ${operator}, ${lengthKm} km.`;
-    line.innerHTML = svgOf(layOut(shown, operator));
+    line.innerHTML = LEGEND + svgOf(layOut(shown, operator));
   };
 
   const compare = (): void => {
