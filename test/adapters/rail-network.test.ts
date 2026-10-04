@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Position } from "../../src/adapters/geo";
+import { distanceKm, type Position } from "../../src/adapters/geo";
 import { buildRailNetwork, type SpeedSection } from "../../src/adapters/rail-network";
 
 /** One degree of latitude is about 111.2 km. */
@@ -48,5 +48,17 @@ describe("Rail network", () => {
     ]);
 
     expect(() => network.routeThrough([at(0), at(2)])).toThrow(/not connected/);
+  });
+
+  it("follows the fastest line rather than the shortest", () => {
+    const detour = at(0.5, 0.3);
+    const network = buildRailNetwork([
+      section(100, at(0), at(1)),
+      section(300, at(0), detour, at(1)),
+    ]);
+
+    const route = network.routeThrough([at(0), at(1)]);
+
+    expect(route.lengthKm).toBeCloseTo(2 * distanceKm(at(0), detour), 1);
   });
 });
