@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { ArcepCoverage } from "../adapters/arcep-coverage";
 import { parseArcepMeasurements } from "../adapters/arcep-measurements";
+import { readLines } from "../adapters/lines";
 import { loadGtfsTimetable } from "../adapters/gtfs-timetable";
 import { buildRailNetwork } from "../adapters/rail-network";
 import { SncfJourneys } from "../adapters/sncf-journeys";
@@ -16,7 +17,7 @@ export async function loadRawData(dir: string): Promise<Dependencies> {
     ),
   );
   const measurements = await timed("measurements", async () =>
-    parseArcepMeasurements(await readFile(`${dir}/arcep-qos-transports.csv`, "utf8")),
+    parseArcepMeasurements(readLines(`${dir}/arcep-qos-transports.csv`)),
   );
   return {
     journeys: new SncfJourneys(timetable, network),

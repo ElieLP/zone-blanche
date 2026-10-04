@@ -1,4 +1,3 @@
-import { linesOf } from "./lines";
 import { OPERATORS, type ConnectivityLevel, type Operator, type Position } from "../domain/model";
 
 export type ArcepMeasurement = {
@@ -48,20 +47,18 @@ export class ArcepMeasurements implements Iterable<ArcepMeasurement> {
 }
 
 /** Reads ARCEP "Mon réseau mobile" QoS transport data: `;`-separated, no quoted fields. */
-export function parseArcepMeasurements(csv: string): ArcepMeasurements {
-  const [header = "", ...lines] = linesOf(csv);
-  const names = header.split(";");
-  const indexes = new Map(
-    COLUMNS.map((column) => {
-      const index = names.indexOf(column);
-      if (index < 0) throw new Error(`Missing column ${column}`);
-      return [column, index];
-    }),
-  );
+export async function parseArcepMeasurements(
+  lines: Iterable<string> | AsyncIterable<string>,
+): Promise<ArcepMeasurements> {
   const measurements = new ArcepMeasurements();
-  for (const line of lines) {
+  let indexes: Map<Column, number> | undefined;
+  for await (const line of lines) {
+    if (!indexes) {
+      indexes = columnIndexes(line);
+      continue;
+    }
     const values = line.split(";");
-    const field = (column: Column) => values[indexes.get(column) ?? -1] ?? "";
+    const field = (column: Column) => values[indexes!.get(column) ?? -1] ?? "";
     if (field("situation") !== "INTRAIN") continue;
     measurements.add({
       operator: operatorOf(field("operator")),
@@ -73,6 +70,17 @@ export function parseArcepMeasurements(csv: string): ArcepMeasurements {
     });
   }
   return measurements;
+}
+
+function columnIndexes(header: string): Map<Column, number> {
+  const names = header.split(";");
+  return new Map(
+    COLUMNS.map((column) => {
+      const index = names.indexOf(column);
+      if (index < 0) throw new Error(`Missing column ${column}`);
+      return [column, index];
+    }),
+  );
 }
 
 function operatorOf(name: string): Operator {

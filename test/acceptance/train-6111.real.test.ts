@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
 import { ArcepCoverage } from "../../src/adapters/arcep-coverage";
 import { parseArcepMeasurements } from "../../src/adapters/arcep-measurements";
+import { readLines } from "../../src/adapters/lines";
 import { loadGtfsTimetable } from "../../src/adapters/gtfs-timetable";
 import { buildRailNetwork } from "../../src/adapters/rail-network";
 import { SncfJourneys } from "../../src/adapters/sncf-journeys";
@@ -20,7 +21,7 @@ async function realDependencies() {
   return {
     journeys: new SncfJourneys(timetable, network),
     coverage: new ArcepCoverage(
-      parseArcepMeasurements(await read("arcep-tgv-paris-marseille.csv")),
+      await parseArcepMeasurements(readLines(`${fixtures}arcep-tgv-paris-marseille.csv`)),
     ),
   };
 }
