@@ -44,4 +44,13 @@ describe("Preparing a train for the webapp", () => {
       },
     });
   });
+
+  it("finds no train when no journey runs on that date", async () => {
+    const prepared = await prepareTrain(
+      { journeys: new InMemoryJourneyRepository(), coverage: new InMemoryCoverageSource({}) },
+      { trainNumber: "3645", date: "2026-10-10" },
+    );
+
+    expect(prepared).toBeUndefined();
+  });
 });

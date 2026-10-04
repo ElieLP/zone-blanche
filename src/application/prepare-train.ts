@@ -13,9 +13,9 @@ export type PreparedTrain = TrainRequest & {
 export async function prepareTrain(
   { journeys, coverage }: Dependencies,
   { trainNumber, date }: TrainRequest,
-): Promise<PreparedTrain> {
+): Promise<PreparedTrain | undefined> {
   const journey = await journeys.find(trainNumber, date);
-  if (!journey) throw new Error(`No journey for train ${trainNumber} on ${date}`);
+  if (!journey) return undefined;
   const stretches = Object.fromEntries(
     await Promise.all(
       OPERATORS.map(async (operator) => {

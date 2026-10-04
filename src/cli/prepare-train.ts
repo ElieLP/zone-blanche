@@ -39,6 +39,10 @@ const prepared = await timed("prepare", () =>
   ),
 );
 
+if (!prepared) {
+  console.error(`No journey for train ${trainNumber} on ${date}`);
+  process.exit(1);
+}
 await mkdir(OUT, { recursive: true });
 const file = `${OUT}/${trainNumber}-${date}.json`;
 await writeFile(file, JSON.stringify(prepared));
