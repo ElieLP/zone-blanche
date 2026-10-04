@@ -81,6 +81,25 @@ describe("Webapp", () => {
     ]);
   });
 
+  it("redraws the line for another operator without loading the train again", async () => {
+    let loads = 0;
+    const root = appWith(async () => {
+      loads++;
+      return train6111;
+    });
+    await ask(root, "6111");
+
+    const sfr = root.querySelector<HTMLInputElement>("input[name=operator][value=SFR]")!;
+    sfr.checked = true;
+    sfr.dispatchEvent(new Event("change", { bubbles: true }));
+
+    expect(status(root)).toBe("Train 6111 on 10/10/2026 with SFR, 750 km.");
+    expect([...root.querySelectorAll("svg rect title")].map((t) => t.textContent)).toEqual([
+      "Weak",
+    ]);
+    expect(loads).toBe(1);
+  });
+
   it("says the train is being prepared while it loads", () => {
     const root = appWith(() => new Promise(() => {}));
 

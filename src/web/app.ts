@@ -26,11 +26,13 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
   <form id="request">
     <label>Train <input id="train" name="train" required /></label>
     <label>Date <input id="date" name="date" value="${formatFrenchDate(today)}" placeholder="dd/mm/yyyy" inputmode="numeric" required /></label>
-    <label>Operator
-      <select id="operator" name="operator">
-        ${OPERATORS.map((o) => `<option>${o}</option>`).join("")}
-      </select>
-    </label>
+    <fieldset class="operators">
+      <legend>Operator</legend>
+      ${OPERATORS.map(
+        (o, i) =>
+          `<label><input type="radio" name="operator" value="${o}" ${i === 0 ? "checked" : ""} />${o}</label>`,
+      ).join("")}
+    </fieldset>
     <button>Show</button>
   </form>
   <p class="legend">
@@ -46,11 +48,21 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
   const message = root.querySelector<HTMLElement>("#message")!;
   const line = root.querySelector<HTMLElement>("#line")!;
 
+  let shown: PreparedTrain | undefined;
+
+  const draw = (): void => {
+    if (!shown) return;
+    const operator = String(new FormData(form).get("operator")) as Operator;
+    const lengthKm = Math.round(shown.stops.at(-1)?.atKm ?? 0);
+    message.textContent = `Train ${shown.trainNumber} on ${formatFrenchDate(shown.date)} with ${operator}, ${lengthKm} km.`;
+    line.innerHTML = svgOf(layOut(shown, operator));
+  };
+
   const show = async (): Promise<void> => {
     const data = new FormData(form);
     const trainNumber = String(data.get("train")).trim();
     const date = parseFrenchDate(String(data.get("date")));
-    const operator = String(data.get("operator")) as Operator;
+    shown = undefined;
     line.innerHTML = "";
     if (!date) {
       message.textContent = "Enter the date as dd/mm/yyyy.";
@@ -58,25 +70,25 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     }
     const shownDate = formatFrenchDate(date);
     message.textContent = `Preparing train ${trainNumber} on ${shownDate}…`;
-    let train: PreparedTrain | undefined;
     try {
-      train = await loadTrain(trainNumber, date);
+      shown = await loadTrain(trainNumber, date);
     } catch {
       message.textContent = `Could not load train ${trainNumber} on ${shownDate}.`;
       return;
     }
-    if (!train) {
+    if (!shown) {
       message.textContent = `Train ${trainNumber} does not run on ${shownDate}.`;
       return;
     }
-    const lengthKm = Math.round(train.stops.at(-1)?.atKm ?? 0);
-    message.textContent = `Train ${trainNumber} on ${shownDate} with ${operator}, ${lengthKm} km.`;
-    line.innerHTML = svgOf(layOut(train, operator));
+    draw();
   };
 
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     void show();
+  });
+  form.addEventListener("change", (event) => {
+    if ((event.target as HTMLInputElement).name === "operator") draw();
   });
 }
 
