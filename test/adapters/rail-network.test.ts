@@ -40,4 +40,13 @@ describe("Rail network", () => {
 
     expect(route.lengthKm).toBeCloseTo(2 * KM_PER_DEGREE, 0);
   });
+
+  it("does not join sections whose ends are more than 200 m apart", () => {
+    const network = buildRailNetwork([
+      section(160, at(0), at(1)),
+      section(160, at(1.003), at(2)), // about 330 m further
+    ]);
+
+    expect(() => network.routeThrough([at(0), at(2)])).toThrow(/not connected/);
+  });
 });
