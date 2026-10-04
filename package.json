@@ -11,6 +11,7 @@
     "lint": "prettier --check .",
     "prepare": "git config core.hooksPath .githooks",
     "prepare-train": "tsx src/cli/prepare-train.ts",
+    "serve": "tsx src/server/main.ts",
     "dev": "vite",
     "build": "vite build"
   },
