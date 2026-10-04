@@ -11,7 +11,8 @@ export class SncfJourneys implements JourneyRepository {
   ) {}
 
   async find(trainNumber: string, date: string): Promise<Journey | undefined> {
-    const stops = this.timetable.stopsOf(trainNumber, date) ?? [];
+    const stops = this.timetable.stopsOf(trainNumber, date);
+    if (!stops) return undefined;
     const route = this.network.routeThrough(stops.map((s) => s.position));
     return {
       stops: stops.map((s, i) => ({ name: s.name, atKm: route.stopsAtKm[i] ?? 0 })),

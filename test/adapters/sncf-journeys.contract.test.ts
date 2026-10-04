@@ -34,4 +34,10 @@ describe("SNCF journeys on real data", () => {
     expect(marseille).toBeCloseTo(750, -1);
     expect(journey?.lengthKm).toBe(journey?.stops.at(-1)?.atKm);
   });
+
+  it("finds no journey on a date the train does not run", async () => {
+    const journeys = await journeysOfTrain6111();
+
+    expect(await journeys.find("6111", "2027-04-01")).toBeUndefined();
+  });
 });
