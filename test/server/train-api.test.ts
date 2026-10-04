@@ -51,4 +51,20 @@ describe("Train API", () => {
 
     expect(response.status).toBe(404);
   });
+
+  it.each(["/api/trains/6111", "/api/trains/6111/10-10-2026", "/api/trains/6111/2026-10-10/x"])(
+    "answers Not Found for %s without preparing anything",
+    async (path) => {
+      let prepared = 0;
+      const url = await serving(async () => {
+        prepared++;
+        return train6111;
+      });
+
+      const response = await fetch(`${url}${path}`);
+
+      expect(response.status).toBe(404);
+      expect(prepared).toBe(0);
+    },
+  );
 });
