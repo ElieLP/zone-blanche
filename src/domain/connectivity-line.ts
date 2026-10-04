@@ -34,8 +34,7 @@ function worstOf(samples: readonly CoverageSample[]): ConnectivityLevel {
     .map((s) => s.level)
     .filter((level): level is MeasuredLevel => level !== "Unknown")
     .reduce<ConnectivityLevel>(
-      (worst, level) =>
-        worst === "Unknown" || SEVERITY[level] > SEVERITY[worst] ? level : worst,
+      (worst, level) => (worst === "Unknown" || SEVERITY[level] > SEVERITY[worst] ? level : worst),
       "Unknown",
     );
 }

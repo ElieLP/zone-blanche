@@ -9,7 +9,13 @@ describe("SNCF speed sections", () => {
         v_max: "300",
         geo_shape: {
           type: "Feature",
-          geometry: { type: "LineString", coordinates: [[4.84, 46.14], [4.85, 46.11]] },
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [4.84, 46.14],
+              [4.85, 46.11],
+            ],
+          },
           properties: {},
         },
       },

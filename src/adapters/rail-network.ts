@@ -38,7 +38,8 @@ export function buildRailNetwork(sections: readonly SpeedSection[]): RailNetwork
     track.forEach((position, i) => {
       vertices.push({ section, position });
       edges.push([]);
-      if (i > 0) connect(first + i - 1, first + i, distanceKm(track[i - 1]!, position), maxSpeedKmh);
+      if (i > 0)
+        connect(first + i - 1, first + i, distanceKm(track[i - 1]!, position), maxSpeedKmh);
     });
     sectionEnds.push(first, vertices.length - 1);
   });
@@ -46,7 +47,12 @@ export function buildRailNetwork(sections: readonly SpeedSection[]): RailNetwork
   const grid = new VertexGrid(vertices);
   for (const end of sectionEnds) {
     const { section, position } = vertices[end]!;
-    const nearest = nearestVertex(vertices, grid.around(position), position, (v) => v.section !== section);
+    const nearest = nearestVertex(
+      vertices,
+      grid.around(position),
+      position,
+      (v) => v.section !== section,
+    );
     if (nearest !== undefined) {
       const km = distanceKm(position, vertices[nearest]!.position);
       if (km <= JUNCTION_TOLERANCE_KM) connect(end, nearest, km, JUNCTION_SPEED_KMH);
@@ -55,7 +61,9 @@ export function buildRailNetwork(sections: readonly SpeedSection[]): RailNetwork
 
   return {
     routeThrough(stops) {
-      const snapped = stops.map((stop) => nearestVertex(vertices, vertices.keys(), stop, () => true) ?? 0);
+      const snapped = stops.map(
+        (stop) => nearestVertex(vertices, vertices.keys(), stop, () => true) ?? 0,
+      );
       const stopsAtKm = [0];
       for (let i = 1; i < snapped.length; i++) {
         stopsAtKm.push(stopsAtKm[i - 1]! + fastestPathKm(edges, snapped[i - 1]!, snapped[i]!));
@@ -90,7 +98,10 @@ class VertexGrid {
 
   constructor(vertices: readonly Vertex[]) {
     vertices.forEach(({ position }, i) => {
-      const key = VertexGrid.key(VertexGrid.cell(position.longitude), VertexGrid.cell(position.latitude));
+      const key = VertexGrid.key(
+        VertexGrid.cell(position.longitude),
+        VertexGrid.cell(position.latitude),
+      );
       const cell = this.cells.get(key);
       if (cell) cell.push(i);
       else this.cells.set(key, [i]);

@@ -29,8 +29,10 @@ export class MinHeap<T> {
         const left = 2 * i + 1;
         const right = left + 1;
         let smallest = i;
-        if (left < items.length && items[left]!.priority < items[smallest]!.priority) smallest = left;
-        if (right < items.length && items[right]!.priority < items[smallest]!.priority) smallest = right;
+        if (left < items.length && items[left]!.priority < items[smallest]!.priority)
+          smallest = left;
+        if (right < items.length && items[right]!.priority < items[smallest]!.priority)
+          smallest = right;
         if (smallest === i) break;
         [items[smallest], items[i]] = [items[i]!, items[smallest]!];
         i = smallest;
