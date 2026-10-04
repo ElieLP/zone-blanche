@@ -233,3 +233,16 @@
   (Paris Austerlitz → Toulouse line) now shows.
 - Next: serve the built page from the same server (one thing to deploy), then
   hosting. ~1 s per request is fine for now; cache if it matters.
+
+## 2026-10-04 — UI/UX pass
+
+- No default train; the date defaults to today (injected, so tests stay
+  deterministic). "Preparing train…" while the API works (~1 s).
+- Operators are cards: switching redraws instantly (no reload), and each card
+  shows its coverage share (mini bar + "% good"), to compare at a glance.
+- Distance marks along the line (5…200 km step, ≤ 15 marks) locate bad zones
+  between distant stops.
+- Restyle: header, form card, dark theme; chart capped at its natural width so
+  text stays readable on a phone. Checked by headless Chromium screenshots
+  (6111, 3645, light/dark, 390 px).
+- Next: shareable URL (train/date/operator in the query string)?
