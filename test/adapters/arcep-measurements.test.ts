@@ -34,4 +34,13 @@ describe("ARCEP on-train measurements", () => {
 
     expect(() => parseArcepMeasurements(csv)).toThrow(/Unknown operator Lebara/);
   });
+
+  it("rejects a file without a column it needs", () => {
+    const csv = [
+      header.replace("loaded_in_less_5_secondes", "other"),
+      "tgv;48.8;1;1;2.3;Orange;INTRAIN",
+    ].join("\n");
+
+    expect(() => parseArcepMeasurements(csv)).toThrow(/Missing column loaded_in_less_5_secondes/);
+  });
 });
