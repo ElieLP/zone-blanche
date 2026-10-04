@@ -73,7 +73,7 @@ itinerary will have mobile network issues.
 - C1. Cut the route into fixed-length chunks (e.g. 1 km) and give each chunk a
   level from the samples near it.
 - C2. If several samples fall in one chunk, apply one rule to choose its level
-  (proposed: **worst wins**).
+  (decided: **majority wins**, a tie goes to the worse level).
 - C3. Merge consecutive chunks with the same level into one stretch.
 - C4. Stretches cover the whole route with no gaps or overlaps. This is an
   invariant, a good fit for a property-based test.
@@ -114,7 +114,8 @@ Scenario: a dead zone between two stops is shown on the line
 
 1. ~~**Missing data**~~ **Decided**: 4th level `Unknown` (explicit in the type, never
    null). No guessing, no theoretical-coverage fallback for now.
-2. **Aggregation**: is "worst wins" inside a chunk the right rule?
+2. ~~**Aggregation**~~ **Decided**: majority wins inside a chunk, a tie goes to the worse
+   level. Worst wins painted 82 % of 6111 None with ~19 ARCEP samples per km.
 3. **Display scale**: space stops in proportion to distance (accurate) or
    evenly (easier to read)?
 4. **Thresholds**: if ARCEP on-train data is already classified, use its scale
