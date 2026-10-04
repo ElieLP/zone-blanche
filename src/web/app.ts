@@ -124,7 +124,7 @@ function svgOf({ stops, stretches }: LineLayout): string {
     .map(
       ({ name, at }) =>
         `<circle cx="${BAR_CENTRE}" cy="${y(at)}" r="16" class="stop" />` +
-        `<text x="${BAR_X + BAR_WIDTH + 20}" y="${y(at)}" dominant-baseline="middle">${escape(name)}</text>`,
+        `<text x="${BAR_X + BAR_WIDTH + 20}" y="${y(at)}" dominant-baseline="middle" class="stop-name">${escape(name)}</text>`,
     )
     .join("");
   return `<svg viewBox="0 0 ${WIDTH} ${LINE_HEIGHT + 2 * MARGIN}" role="img" aria-label="Connectivity along the line">${bars}${markers}</svg>`;

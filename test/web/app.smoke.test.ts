@@ -70,7 +70,7 @@ describe("Webapp", () => {
     expect(asked).toEqual([["6111", "2026-10-10"]]);
     expect(status(root)).toBe("Train 6111 on 10/10/2026 with Orange, 750 km.");
     const svg = root.querySelector("svg");
-    expect([...(svg?.querySelectorAll("text") ?? [])].map((t) => t.textContent)).toEqual([
+    expect([...(svg?.querySelectorAll("text.stop-name") ?? [])].map((t) => t.textContent)).toEqual([
       "Paris Gare de Lyon Hall 1 - 2",
       "Avignon TGV",
       "Marseille Saint-Charles",
