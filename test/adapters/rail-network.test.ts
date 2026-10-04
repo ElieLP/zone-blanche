@@ -21,4 +21,12 @@ describe("Rail network", () => {
     expect(route.lengthKm).toBeCloseTo(KM_PER_DEGREE, 1);
     expect(route.stopsAtKm).toEqual([0, route.lengthKm]);
   });
+
+  it("places a stop off the track at the nearest point of the track", () => {
+    const network = buildRailNetwork([section(160, at(0), at(0.5), at(1))]);
+
+    const route = network.routeThrough([at(0), at(0.5, 0.001), at(1)]);
+
+    expect(route.stopsAtKm[1]).toBeCloseTo(KM_PER_DEGREE / 2, 1);
+  });
 });

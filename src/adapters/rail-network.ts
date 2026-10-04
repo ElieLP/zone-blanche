@@ -15,11 +15,22 @@ export type RailNetwork = {
 };
 
 export function buildRailNetwork(sections: readonly SpeedSection[]): RailNetwork {
+  const track = sections[0]?.track ?? [];
+  const kmAt = track.map((_, i) =>
+    track.slice(1, i + 1).reduce((km, p, j) => km + distanceKm(track[j]!, p), 0),
+  );
+  const nearestKm = (stop: Position): number => {
+    let best = 0;
+    track.forEach((p, i) => {
+      if (distanceKm(stop, p) < distanceKm(stop, track[best]!)) best = i;
+    });
+    return kmAt[best] ?? 0;
+  };
+
   return {
-    routeThrough() {
-      const track = sections[0]?.track ?? [];
-      const lengthKm = track.slice(1).reduce((km, p, i) => km + distanceKm(track[i]!, p), 0);
-      return { lengthKm, stopsAtKm: [0, lengthKm] };
+    routeThrough(stops) {
+      const stopsAtKm = stops.map(nearestKm);
+      return { lengthKm: stopsAtKm.at(-1) ?? 0, stopsAtKm };
     },
   };
 }
