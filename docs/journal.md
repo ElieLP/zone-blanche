@@ -120,3 +120,21 @@
 - The feed has no quoted fields and no BOM, so a plain comma split is enough.
 - Gap confirmed: GTFS gives stop coordinates, not positions along the track.
   The domain's `Stop.atKm` needs route reconstruction (RFN shapes) first.
+
+## 2026-10-04 — Route reconstruction spike (train 6111)
+
+- RFN line shapes (`formes-des-lignes-du-rfn`): 787 operating lines, one
+  `LineString` each, but they don't share vertices at junctions, so a raw graph
+  falls apart into hundreds of components.
+- Fix: keep each shape exact and link every section end to the nearest vertex
+  of another section within **200 m**. Rounding coordinates to a grid also
+  connects things, but can invent junctions where lines cross on bridges.
+- **Shortest distance is the wrong rule**: Paris→Avignon took the classic line
+  along the Rhône (207 km on 830000), which is shorter than the LGV around Lyon.
+  Trains minimise *time*.
+- Better source: `vitesse-maximale-nominale-sur-ligne` (2373 sections, each with
+  its own `LineString` and `v_max`). Weight = length / v_max.
+- Result for 6111: Paris→Avignon 657 km (608 km on LGV 752000), →Aix 75 km,
+  →Marseille 19 km; **750 km in total**, which matches the real line.
+- Decision: build the route graph from the speed sections, route by travel time,
+  200 m end-linking. Stops snap to the nearest vertex.
