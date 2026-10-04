@@ -10,7 +10,7 @@ const CELL_DEGREES = 0.02;
 /** Places each measurement of the operator at its distance along the track. */
 export function coverageAlongTrack(
   track: readonly Position[],
-  measurements: readonly ArcepMeasurement[],
+  measurements: Iterable<ArcepMeasurement>,
   operator: Operator,
 ): CoverageSample[] {
   const kmAt = [0];
@@ -18,8 +18,9 @@ export function coverageAlongTrack(
     kmAt.push(kmAt[i - 1]! + distanceKm(track[i - 1]!, track[i]!));
   }
   const segmentsNear = segmentGrid(track);
-  return measurements.flatMap(({ operator: measuredBy, position, level }) => {
-    if (measuredBy !== operator) return [];
+  const samples: CoverageSample[] = [];
+  for (const { operator: measuredBy, position, level } of measurements) {
+    if (measuredBy !== operator) continue;
     let best = { offsetKm: Infinity, atKm: 0 };
     for (const i of segmentsNear(position)) {
       const { offsetKm, along } = projectOnSegment(position, track[i - 1]!, track[i]!);
@@ -27,8 +28,9 @@ export function coverageAlongTrack(
         best = { offsetKm, atKm: kmAt[i - 1]! + along * (kmAt[i]! - kmAt[i - 1]!) };
       }
     }
-    return best.offsetKm <= MAX_OFFSET_KM ? [{ atKm: best.atKm, level }] : [];
-  });
+    if (best.offsetKm <= MAX_OFFSET_KM) samples.push({ atKm: best.atKm, level });
+  }
+  return samples;
 }
 
 const cellOf = (degrees: number) => Math.floor(degrees / CELL_DEGREES);

@@ -5,7 +5,7 @@ import { coverageAlongTrack } from "./coverage-along-track";
 
 /** Coverage measured by ARCEP on board trains, placed along the journey's track. */
 export class ArcepCoverage implements CoverageSource {
-  constructor(private readonly measurements: readonly ArcepMeasurement[]) {}
+  constructor(private readonly measurements: Iterable<ArcepMeasurement>) {}
 
   async samplesAlong(journey: Journey, operator: Operator): Promise<readonly CoverageSample[]> {
     return coverageAlongTrack(journey.track, this.measurements, operator);
