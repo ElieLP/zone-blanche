@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import type { PreparedTrain } from "../../src/application/prepare-train";
 import type { Stretch } from "../../src/domain/model";
-import { startApp } from "../../src/web/app";
+import { startApp, type TrainLoader } from "../../src/web/app";
 
 const along = (level: Stretch["level"]): Stretch[] => [{ fromKm: 0, toKm: 750, level }];
 
@@ -25,21 +25,50 @@ const train6111: PreparedTrain = {
   },
 };
 
+const TODAY = "2026-10-04";
+
+function appWith(loadTrain: TrainLoader): HTMLElement {
+  const root = document.createElement("main");
+  startApp(root, loadTrain, TODAY);
+  return root;
+}
+
+/** Fills in the form, submits it, and lets the loading settle. */
+async function ask(root: HTMLElement, trainNumber: string, date = "10/10/2026"): Promise<void> {
+  root.querySelector<HTMLInputElement>("#train")!.value = trainNumber;
+  root.querySelector<HTMLInputElement>("#date")!.value = date;
+  root.querySelector("form")!.dispatchEvent(new Event("submit", { cancelable: true }));
+  await new Promise((resolve) => setTimeout(resolve));
+}
+
+const status = (root: HTMLElement) => root.querySelector("[role=status]")?.textContent;
+
 describe("Webapp", () => {
-  it("shows the pre-filled train as a line with its stops and stretches", async () => {
-    const root = document.createElement("main");
+  it("starts with no train, on today's date, without loading anything", () => {
+    let loads = 0;
 
+    const root = appWith(async () => {
+      loads++;
+      return train6111;
+    });
+
+    expect(root.querySelector<HTMLInputElement>("#train")?.value).toBe("");
+    expect(root.querySelector<HTMLInputElement>("#date")?.value).toBe("04/10/2026");
+    expect(loads).toBe(0);
+    expect(root.querySelector("svg")).toBeNull();
+  });
+
+  it("shows the asked train as a line with its stops and stretches", async () => {
     const asked: [string, string][] = [];
-
-    await startApp(root, async (trainNumber, date) => {
+    const root = appWith(async (trainNumber, date) => {
       asked.push([trainNumber, date]);
       return train6111;
     });
 
+    await ask(root, "6111");
+
     expect(asked).toEqual([["6111", "2026-10-10"]]);
-    expect(root.querySelector("[role=status]")?.textContent).toBe(
-      "Train 6111 on 10/10/2026 with Orange, 750 km.",
-    );
+    expect(status(root)).toBe("Train 6111 on 10/10/2026 with Orange, 750 km.");
     const svg = root.querySelector("svg");
     expect([...(svg?.querySelectorAll("text") ?? [])].map((t) => t.textContent)).toEqual([
       "Paris Gare de Lyon Hall 1 - 2",
@@ -52,55 +81,44 @@ describe("Webapp", () => {
     ]);
   });
 
-  it("says the train is being prepared while it loads", async () => {
-    const root = document.createElement("main");
-    let answer: (train: PreparedTrain) => void = () => {};
+  it("says the train is being prepared while it loads", () => {
+    const root = appWith(() => new Promise(() => {}));
 
-    const shown = startApp(root, () => new Promise((resolve) => (answer = resolve)));
+    void ask(root, "6111");
 
-    expect(root.querySelector("[role=status]")?.textContent).toBe(
-      "Preparing train 6111 on 10/10/2026…",
-    );
-    answer(train6111);
-    await shown;
+    expect(status(root)).toBe("Preparing train 6111 on 10/10/2026…");
   });
 
   it("says so when no data was prepared for the train", async () => {
-    const root = document.createElement("main");
+    const root = appWith(async () => undefined);
 
-    await startApp(root, async () => undefined);
+    await ask(root, "6111");
 
-    expect(root.querySelector("[role=status]")?.textContent).toBe(
-      "No data prepared for train 6111 on 10/10/2026.",
-    );
+    expect(status(root)).toBe("No data prepared for train 6111 on 10/10/2026.");
     expect(root.querySelector("svg")).toBeNull();
   });
 
   it("says so when the train cannot be loaded", async () => {
-    const root = document.createElement("main");
-
-    await startApp(root, async () => {
+    const root = appWith(async () => {
       throw new SyntaxError("Unexpected token < in JSON");
     });
 
-    expect(root.querySelector("[role=status]")?.textContent).toBe(
-      "Could not load train 6111 on 10/10/2026.",
-    );
+    await ask(root, "6111");
+
+    expect(status(root)).toBe("Could not load train 6111 on 10/10/2026.");
   });
 
   it("asks for a dd/mm/yyyy date when the date is not one", async () => {
-    const root = document.createElement("main");
     let loads = 0;
-    await startApp(root, async () => {
+    const root = appWith(async () => {
       loads++;
       return train6111;
     });
 
-    root.querySelector<HTMLInputElement>("#date")!.value = "2026-10-10";
-    root.querySelector("form")!.dispatchEvent(new Event("submit", { cancelable: true }));
+    await ask(root, "6111", "2026-10-10");
 
-    expect(root.querySelector("[role=status]")?.textContent).toBe("Enter the date as dd/mm/yyyy.");
+    expect(status(root)).toBe("Enter the date as dd/mm/yyyy.");
     expect(root.querySelector("svg")).toBeNull();
-    expect(loads).toBe(1);
+    expect(loads).toBe(0);
   });
 });

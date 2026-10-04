@@ -19,13 +19,13 @@ const LEVEL_COLOURS: Record<ConnectivityLevel, string> = {
 /** Finds the prepared data of a train on a date, if there is any. */
 export type TrainLoader = (trainNumber: string, date: string) => Promise<PreparedTrain | undefined>;
 
-/** Renders the page into `root` and shows the pre-filled train; resolves once it is shown. */
-export function startApp(root: HTMLElement, loadTrain: TrainLoader): Promise<void> {
+/** Renders the page into `root`, dated `today` (YYYY-MM-DD), waiting for a train to be asked. */
+export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: string): void {
   root.innerHTML = `
   <h1>Train connectivity</h1>
   <form id="request">
-    <label>Train <input id="train" name="train" value="6111" required /></label>
-    <label>Date <input id="date" name="date" value="10/10/2026" placeholder="dd/mm/yyyy" inputmode="numeric" required /></label>
+    <label>Train <input id="train" name="train" required /></label>
+    <label>Date <input id="date" name="date" value="${formatFrenchDate(today)}" placeholder="dd/mm/yyyy" inputmode="numeric" required /></label>
     <label>Operator
       <select id="operator" name="operator">
         ${OPERATORS.map((o) => `<option>${o}</option>`).join("")}
@@ -78,7 +78,6 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader): Promise<voi
     event.preventDefault();
     void show();
   });
-  return show();
 }
 
 function svgOf({ stops, stretches }: LineLayout): string {
