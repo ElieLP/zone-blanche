@@ -110,3 +110,13 @@
 2. Failing acceptance test from `domain.md` with in-memory fakes of both ports.
 3. Make it pass with the pure domain, then real adapters one at a time,
    starting with route reconstruction for train 6111.
+
+## 2026-10-04 — GTFS adapter, first contact with real data
+
+- One train number = many GTFS trips (train 6111: 12 trips, one per service
+  period). The date picks the trip through `calendar_dates` (`exception_type=1`).
+- Stop names come raw from GTFS, e.g. `Paris Gare de Lyon Hall 1 - 2`. Fine for
+  now; shorter display names can wait.
+- The feed has no quoted fields and no BOM, so a plain comma split is enough.
+- Gap confirmed: GTFS gives stop coordinates, not positions along the track.
+  The domain's `Stop.atKm` needs route reconstruction (RFN shapes) first.
