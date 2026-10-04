@@ -29,7 +29,7 @@ export class InMemoryCoverageSource implements CoverageSource {
 }
 
 export function journeyThrough(...stops: Stop[]): Journey {
-  return { stops, lengthKm: stops.at(-1)?.atKm ?? 0 };
+  return { stops, lengthKm: stops.at(-1)?.atKm ?? 0, track: [] };
 }
 
 export function stop(name: string, atKm: number): Stop {

@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
+import { distanceKm } from "../../src/adapters/geo";
 import { loadGtfsTimetable } from "../../src/adapters/gtfs-timetable";
 import { buildRailNetwork } from "../../src/adapters/rail-network";
 import { SncfJourneys } from "../../src/adapters/sncf-journeys";
@@ -39,5 +40,18 @@ describe("SNCF journeys on real data", () => {
     const journeys = await journeysOfTrain6111();
 
     expect(await journeys.find("6111", "2027-04-01")).toBeUndefined();
+  });
+
+  it("gives the track the train follows, from its first stop to its last", async () => {
+    const parisGareDeLyon = { latitude: 48.844945, longitude: 2.373481 };
+    const marseilleSaintCharles = { latitude: 43.302666, longitude: 5.380407 };
+    const journeys = await journeysOfTrain6111();
+
+    const journey = await journeys.find("6111", "2026-10-10");
+
+    const first = journey?.track[0];
+    const last = journey?.track.at(-1);
+    expect(first && distanceKm(first, parisGareDeLyon)).toBeLessThan(1);
+    expect(last && distanceKm(last, marseilleSaintCharles)).toBeLessThan(1);
   });
 });

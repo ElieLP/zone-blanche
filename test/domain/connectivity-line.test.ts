@@ -8,6 +8,7 @@ const journeyOf = (lengthKm: number): Journey => ({
     { name: "B", atKm: lengthKm },
   ],
   lengthKm,
+  track: [],
 });
 
 const sample = (atKm: number, level: ConnectivityLevel) => ({ atKm, level });

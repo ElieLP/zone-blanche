@@ -11,6 +11,8 @@ export type Stop = { readonly name: string; readonly atKm: number };
 export type Journey = {
   readonly stops: readonly Stop[];
   readonly lengthKm: number;
+  /** Positions the train follows from the first stop to the last. */
+  readonly track: readonly Position[];
 };
 
 export type CoverageSample = {

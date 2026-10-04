@@ -17,6 +17,7 @@ export class SncfJourneys implements JourneyRepository {
     return {
       stops: stops.map((s, i) => ({ name: s.name, atKm: route.stopsAtKm[i] ?? 0 })),
       lengthKm: route.lengthKm,
+      track: route.track,
     };
   }
 }
