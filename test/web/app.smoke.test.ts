@@ -52,6 +52,19 @@ describe("Webapp", () => {
     ]);
   });
 
+  it("says the train is being prepared while it loads", async () => {
+    const root = document.createElement("main");
+    let answer: (train: PreparedTrain) => void = () => {};
+
+    const shown = startApp(root, () => new Promise((resolve) => (answer = resolve)));
+
+    expect(root.querySelector("[role=status]")?.textContent).toBe(
+      "Preparing train 6111 on 10/10/2026…",
+    );
+    answer(train6111);
+    await shown;
+  });
+
   it("says so when no data was prepared for the train", async () => {
     const root = document.createElement("main");
 

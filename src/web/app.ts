@@ -57,6 +57,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader): Promise<voi
       return;
     }
     const shownDate = formatFrenchDate(date);
+    message.textContent = `Preparing train ${trainNumber} on ${shownDate}…`;
     let train: PreparedTrain | undefined;
     try {
       train = await loadTrain(trainNumber, date);
