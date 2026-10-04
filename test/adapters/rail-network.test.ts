@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { distanceKm, type Position } from "../../src/adapters/geo";
+import { distanceKm } from "../../src/adapters/geo";
 import { buildRailNetwork, type SpeedSection } from "../../src/adapters/rail-network";
+import type { Position } from "../../src/domain/model";
 
 /** One degree of latitude is about 111.2 km. */
 const KM_PER_DEGREE = 111.195;

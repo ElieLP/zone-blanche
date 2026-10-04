@@ -1,5 +1,4 @@
-import { OPERATORS, type ConnectivityLevel, type Operator } from "../domain/model";
-import type { Position } from "./geo";
+import { OPERATORS, type ConnectivityLevel, type Operator, type Position } from "../domain/model";
 
 export type ArcepMeasurement = {
   readonly operator: Operator;

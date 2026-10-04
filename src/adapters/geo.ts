@@ -1,4 +1,4 @@
-export type Position = { readonly latitude: number; readonly longitude: number };
+import type { Position } from "../domain/model";
 
 const EARTH_RADIUS_KM = 6371;
 const radians = (degrees: number) => (degrees * Math.PI) / 180;

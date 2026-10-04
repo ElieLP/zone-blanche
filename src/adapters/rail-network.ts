@@ -1,4 +1,5 @@
-import { distanceKm, type Position } from "./geo";
+import type { Position } from "../domain/model";
+import { distanceKm } from "./geo";
 import { MinHeap } from "./min-heap";
 
 export type SpeedSection = {

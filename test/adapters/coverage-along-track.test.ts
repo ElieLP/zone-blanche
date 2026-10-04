@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ArcepMeasurement } from "../../src/adapters/arcep-measurements";
 import { coverageAlongTrack } from "../../src/adapters/coverage-along-track";
-import type { Position } from "../../src/adapters/geo";
+import type { Position } from "../../src/domain/model";
 
 /** One degree of latitude is about 111.2 km. */
 const KM_PER_DEGREE = 111.195;

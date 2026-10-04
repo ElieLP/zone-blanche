@@ -2,6 +2,8 @@ export const OPERATORS = ["Orange", "SFR", "Bouygues", "Free"] as const;
 
 export type Operator = (typeof OPERATORS)[number];
 
+export type Position = { readonly latitude: number; readonly longitude: number };
+
 export type ConnectivityLevel = "Good" | "Weak" | "None" | "Unknown";
 
 export type Stop = { readonly name: string; readonly atKm: number };

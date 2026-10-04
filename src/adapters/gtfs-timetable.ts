@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { Position } from "./geo";
+import type { Position } from "../domain/model";
 
 export type TimetabledStop = { readonly name: string; readonly position: Position };
 
