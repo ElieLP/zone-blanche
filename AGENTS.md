@@ -1,6 +1,6 @@
 # Agent Guidelines
 
-Stay concise
+Stay concise.
 
 ## Delivery
 - Keep the software releasable at all times: any change (feature, fix, config, experiment) must be shippable safely whenever the business chooses.
@@ -20,6 +20,7 @@ Stay concise
 - Maximize the amount of work not done.
 - **Hexagonal architecture (ports & adapters)**: the domain never depends on infrastructure.
 - **Ubiquitous language** (DDD): code names match the business vocabulary.
+- **The model is a hypothesis**: refine the domain model through contact with reality.
 - **Functional core, imperative shell**: pure logic inside, side effects at the edges.
 - **Parse, don't validate**: convert raw input into typed values at the boundary.
 - **Make illegal states unrepresentable**: let types enforce the invariants.
