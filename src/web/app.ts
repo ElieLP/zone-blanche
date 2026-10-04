@@ -6,7 +6,7 @@ import { layOut, type LineLayout } from "./layout";
 
 const LINE_HEIGHT = 2000;
 const MARGIN = 24;
-const WIDTH = 600;
+const WIDTH = 440;
 const BAR_X = 76;
 const BAR_WIDTH = 28;
 const BAR_CENTRE = BAR_X + BAR_WIDTH / 2;
@@ -23,25 +23,30 @@ export type TrainLoader = (trainNumber: string, date: string) => Promise<Prepare
 /** Renders the page into `root`, dated `today` (YYYY-MM-DD), waiting for a train to be asked. */
 export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: string): void {
   root.innerHTML = `
-  <h1>Train connectivity</h1>
-  <form id="request">
-    <label>Train <input id="train" name="train" required /></label>
-    <label>Date <input id="date" name="date" value="${formatFrenchDate(today)}" placeholder="dd/mm/yyyy" inputmode="numeric" required /></label>
+  <header class="masthead">
+    <h1>Train connectivity</h1>
+    <p>Mobile coverage along a French train journey, from ARCEP's on-board measurements.</p>
+  </header>
+  <form id="request" class="card">
+    <div class="fields">
+      <label class="field"><span>Train number</span><input id="train" name="train" placeholder="6111" inputmode="numeric" autocomplete="off" required /></label>
+      <label class="field"><span>Date</span><input id="date" name="date" value="${formatFrenchDate(today)}" placeholder="dd/mm/yyyy" inputmode="numeric" required /></label>
+      <button>Show coverage</button>
+    </div>
     <fieldset class="operators">
       <legend>Operator</legend>
       ${OPERATORS.map(
         (o, i) =>
-          `<label><input type="radio" name="operator" value="${o}" ${i === 0 ? "checked" : ""} />${o}<span class="share" data-operator="${o}"></span></label>`,
+          `<label><input type="radio" name="operator" value="${o}" ${i === 0 ? "checked" : ""} /><span class="name">${o}</span><span class="share" data-operator="${o}"></span></label>`,
       ).join("")}
     </fieldset>
-    <button>Show</button>
   </form>
+  <p id="message" role="status"></p>
   <p class="legend">
     ${Object.entries(LEVEL_COLOURS)
       .map(([level, colour]) => `<span><i style="background:${colour}"></i>${level}</span>`)
       .join("")}
   </p>
-  <p id="message" role="status"></p>
   <div id="line"></div>
 `;
 

@@ -7,48 +7,217 @@
     <style>
       :root {
         color-scheme: light dark;
-        font-family: system-ui, sans-serif;
+        --bg: #f4f5f7;
+        --surface: #ffffff;
+        --text: #1b1f27;
+        --muted: #667085;
+        --border: #dde1e7;
+        --accent: #3651d4;
+        --accent-text: #ffffff;
+        --accent-soft: #e8ecfd;
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        line-height: 1.45;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #12151b;
+          --surface: #1b1f27;
+          --text: #e8eaee;
+          --muted: #98a1b0;
+          --border: #2d333e;
+          --accent: #7b8ff0;
+          --accent-text: #10131a;
+          --accent-soft: #252c48;
+        }
+      }
+      * {
+        box-sizing: border-box;
       }
       body {
-        margin: 0 auto;
-        max-width: 40rem;
-        padding: 1rem;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
       }
-      form {
+      main {
+        max-width: 44rem;
+        margin: 0 auto;
+        padding: 2rem 1rem 4rem;
+      }
+      .masthead h1 {
+        margin: 0;
+        font-size: 1.75rem;
+        letter-spacing: -0.02em;
+      }
+      .masthead p {
+        margin: 0.25rem 0 1.5rem;
+        color: var(--muted);
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem;
+        box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+      }
+      .fields {
         display: flex;
         flex-wrap: wrap;
         gap: 0.75rem;
         align-items: end;
       }
-      label {
+      .field {
         display: grid;
-        gap: 0.25rem;
-        font-size: 0.9rem;
+        gap: 0.3rem;
+        flex: 1 1 9rem;
+      }
+      .field span,
+      legend {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      input,
+      button {
+        font: inherit;
+        height: 2.75rem;
+        border-radius: 10px;
+      }
+      input {
+        width: 100%;
+        padding: 0 0.85rem;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+      }
+      input:focus-visible,
+      button:focus-visible,
+      .operators label:has(input:focus-visible) {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      button {
+        flex: 0 0 auto;
+        padding: 0 1.25rem;
+        border: 0;
+        background: var(--accent);
+        color: var(--accent-text);
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:hover {
+        filter: brightness(1.08);
+      }
+      .operators {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+        gap: 0.5rem;
+        margin: 1.25rem 0 0;
+        padding: 0;
+        border: 0;
+      }
+      .operators legend {
+        margin-bottom: 0.4rem;
+        padding: 0;
+      }
+      .operators label {
+        display: grid;
+        gap: 0.35rem;
+        padding: 0.65rem 0.8rem;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .operators label:has(:checked) {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        box-shadow: inset 0 0 0 1px var(--accent);
+      }
+      .operators input {
+        position: absolute;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+      }
+      .operators .name {
+        font-weight: 600;
+      }
+      .share {
+        display: grid;
+        gap: 0.3rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .share:empty {
+        display: none;
+      }
+      .share .bar {
+        display: flex;
+        height: 6px;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      #message {
+        margin: 1.5rem 0 0.5rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+      }
+      #message:empty {
+        display: none;
       }
       .legend {
         display: flex;
-        gap: 1rem;
-        font-size: 0.9rem;
+        flex-wrap: wrap;
+        gap: 0.4rem 1rem;
+        margin: 0 0 1rem;
+        font-size: 0.85rem;
+        color: var(--muted);
       }
       .legend i {
         display: inline-block;
-        width: 0.8rem;
-        height: 0.8rem;
+        width: 0.7rem;
+        height: 0.7rem;
         border-radius: 50%;
-        margin-right: 0.3rem;
+        margin-right: 0.35rem;
+        vertical-align: -0.05rem;
+      }
+      #line:not(:empty) {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 0.5rem;
       }
       svg {
+        display: block;
         width: 100%;
+        max-width: 440px;
         height: auto;
       }
       svg text {
-        font-size: 22px;
+        fill: var(--text);
+      }
+      svg .stop-name {
+        font-size: 18px;
         font-weight: 600;
-        fill: currentColor;
+      }
+      svg text.tick {
+        font-size: 14px;
+        fill: var(--muted);
+      }
+      svg line.tick {
+        stroke: var(--muted);
+        stroke-width: 1.5;
       }
       .stop {
-        fill: Canvas;
-        stroke: CanvasText;
+        fill: var(--surface);
+        stroke: var(--text);
         stroke-width: 5;
       }
     </style>
