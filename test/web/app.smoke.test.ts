@@ -100,6 +100,15 @@ describe("Webapp", () => {
     expect(loads).toBe(1);
   });
 
+  it("marks the distance along the line", async () => {
+    const root = appWith(async () => train6111);
+
+    await ask(root, "6111");
+
+    const ticks = [...root.querySelectorAll("svg text.tick")].map((t) => t.textContent);
+    expect([ticks.at(0), ticks.at(-1), ticks.length]).toEqual(["50 km", "700 km", 14]);
+  });
+
   it("compares how much of the journey each operator covers well", async () => {
     const root = appWith(async () => train6111);
 

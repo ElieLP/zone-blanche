@@ -7,8 +7,8 @@ import { layOut, type LineLayout } from "./layout";
 const LINE_HEIGHT = 2000;
 const MARGIN = 24;
 const WIDTH = 600;
-const BAR_X = 20;
-const BAR_WIDTH = 40;
+const BAR_X = 76;
+const BAR_WIDTH = 28;
 const BAR_CENTRE = BAR_X + BAR_WIDTH / 2;
 const LEVEL_COLOURS: Record<ConnectivityLevel, string> = {
   Good: "#2e8a57",
@@ -112,8 +112,15 @@ function shareOf(share: CoverageShare): string {
   return `<span class="bar">${bar}</span>${Math.round(share.Good * 100)}% good`;
 }
 
-function svgOf({ stops, stretches }: LineLayout): string {
+function svgOf({ stops, stretches, ticks }: LineLayout): string {
   const y = (at: number) => MARGIN + at * LINE_HEIGHT;
+  const marks = ticks
+    .map(
+      ({ km, at }) =>
+        `<line x1="${BAR_X - 14}" x2="${BAR_X - 4}" y1="${y(at)}" y2="${y(at)}" class="tick" />` +
+        `<text x="${BAR_X - 20}" y="${y(at)}" text-anchor="end" dominant-baseline="middle" class="tick">${km} km</text>`,
+    )
+    .join("");
   const bars = stretches
     .map(
       ({ from, to, level }) =>
@@ -123,11 +130,12 @@ function svgOf({ stops, stretches }: LineLayout): string {
   const markers = stops
     .map(
       ({ name, at }) =>
-        `<circle cx="${BAR_CENTRE}" cy="${y(at)}" r="16" class="stop" />` +
+        `<circle cx="${BAR_CENTRE}" cy="${y(at)}" r="11" class="stop" />` +
         `<text x="${BAR_X + BAR_WIDTH + 20}" y="${y(at)}" dominant-baseline="middle" class="stop-name">${escape(name)}</text>`,
     )
     .join("");
-  return `<svg viewBox="0 0 ${WIDTH} ${LINE_HEIGHT + 2 * MARGIN}" role="img" aria-label="Connectivity along the line">${bars}${markers}</svg>`;
+  const track = `<clipPath id="track"><rect x="${BAR_X}" y="${MARGIN}" width="${BAR_WIDTH}" height="${LINE_HEIGHT}" rx="${BAR_WIDTH / 2}" /></clipPath>`;
+  return `<svg viewBox="0 0 ${WIDTH} ${LINE_HEIGHT + 2 * MARGIN}" role="img" aria-label="Connectivity along the line">${track}${marks}<g clip-path="url(#track)">${bars}</g>${markers}</svg>`;
 }
 
 function escape(text: string): string {
