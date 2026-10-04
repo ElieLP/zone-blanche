@@ -100,6 +100,19 @@ describe("Webapp", () => {
     expect(loads).toBe(1);
   });
 
+  it("compares how much of the journey each operator covers well", async () => {
+    const root = appWith(async () => train6111);
+
+    await ask(root, "6111");
+
+    expect([...root.querySelectorAll(".operators label")].map((l) => l.textContent)).toEqual([
+      "Orange80% good",
+      "SFR0% good",
+      "Bouygues0% good",
+      "Free100% good",
+    ]);
+  });
+
   it("says the train is being prepared while it loads", () => {
     const root = appWith(() => new Promise(() => {}));
 

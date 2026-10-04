@@ -1,4 +1,5 @@
 import type { PreparedTrain } from "../application/prepare-train";
+import { coverageShare, type CoverageShare } from "../domain/coverage-share";
 import { OPERATORS, type ConnectivityLevel, type Operator } from "../domain/model";
 import { formatFrenchDate, parseFrenchDate } from "./french-date";
 import { layOut, type LineLayout } from "./layout";
@@ -30,7 +31,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
       <legend>Operator</legend>
       ${OPERATORS.map(
         (o, i) =>
-          `<label><input type="radio" name="operator" value="${o}" ${i === 0 ? "checked" : ""} />${o}</label>`,
+          `<label><input type="radio" name="operator" value="${o}" ${i === 0 ? "checked" : ""} />${o}<span class="share" data-operator="${o}"></span></label>`,
       ).join("")}
     </fieldset>
     <button>Show</button>
@@ -58,12 +59,20 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     line.innerHTML = svgOf(layOut(shown, operator));
   };
 
+  const compare = (): void => {
+    for (const share of root.querySelectorAll<HTMLElement>(".share")) {
+      const operator = share.dataset.operator as Operator;
+      share.innerHTML = shown ? shareOf(coverageShare(shown.stretches[operator])) : "";
+    }
+  };
+
   const show = async (): Promise<void> => {
     const data = new FormData(form);
     const trainNumber = String(data.get("train")).trim();
     const date = parseFrenchDate(String(data.get("date")));
     shown = undefined;
     line.innerHTML = "";
+    compare();
     if (!date) {
       message.textContent = "Enter the date as dd/mm/yyyy.";
       return;
@@ -80,6 +89,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
       message.textContent = `Train ${trainNumber} does not run on ${shownDate}.`;
       return;
     }
+    compare();
     draw();
   };
 
@@ -90,6 +100,16 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
   form.addEventListener("change", (event) => {
     if ((event.target as HTMLInputElement).name === "operator") draw();
   });
+}
+
+function shareOf(share: CoverageShare): string {
+  const bar = Object.entries(share)
+    .map(
+      ([level, part]) =>
+        `<i style="flex-grow:${part};background:${LEVEL_COLOURS[level as ConnectivityLevel]}"></i>`,
+    )
+    .join("");
+  return `<span class="bar">${bar}</span>${Math.round(share.Good * 100)}% good`;
 }
 
 function svgOf({ stops, stretches }: LineLayout): string {
