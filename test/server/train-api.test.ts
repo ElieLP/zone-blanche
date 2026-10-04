@@ -43,4 +43,12 @@ describe("Train API", () => {
     expect(response.headers.get("Content-Type")).toBe("application/json");
     expect(await response.json()).toEqual(train6111);
   });
+
+  it("answers Not Found when the train does not run that day", async () => {
+    const url = await serving(async () => undefined);
+
+    const response = await fetch(`${url}/api/trains/3645/2026-10-10`);
+
+    expect(response.status).toBe(404);
+  });
 });

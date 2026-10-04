@@ -10,6 +10,11 @@ export function trainApi(prepare: TrainPreparer): RequestListener {
   return async (request, response) => {
     const [, trainNumber = "", date = ""] = TRAIN_ROUTE.exec(request.url ?? "") ?? [];
     const train = await prepare({ trainNumber, date });
+    if (!train) {
+      response.statusCode = 404;
+      response.end();
+      return;
+    }
     response.setHeader("Content-Type", "application/json");
     response.end(JSON.stringify(train));
   };
