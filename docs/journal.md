@@ -196,3 +196,28 @@
 - Next: the offline preparation script (full GTFS + speed sections + ARCEP →
   JSON per train), then the SVG page. Open: decision 3 (display scale), and
   whether 1 km chunks are too fine for a readable line.
+
+## 2026-10-04 — Walking skeleton end to end
+
+- `scripts/download-data.sh` fetches the raw data into `data/raw/` (ignored).
+- `npm run prepare-train -- 6111 2026-10-10` writes
+  `public/data/6111-2026-10-10.json` (ignored, regenerate): the stops and the
+  stretches of all four operators (`prepareTrain`).
+- Full data, every in-train measurement within 1 km of the track:
+
+  | 6111 | Good | Weak | None | Unknown | stretches |
+  |---|---|---|---|---|---|
+  | Orange | 679 km | 38 | 30 | 3 | 124 |
+  | SFR | 601 | 20 | 128 | 1 | 154 |
+  | Bouygues | 582 | 27 | 140 | 1 | 160 |
+  | Free | 648 | 33 | 68 | 1 | 132 |
+
+- First run took 343 s (every measurement in France against every track
+  segment); a grid index of segments brought it to 1.2 s, same output.
+- Webapp (Vite, plain TS): form pre-filled with 6111, vertical SVG line, stops
+  spaced by distance (decision 3, provisional). Checked with a headless
+  Chromium screenshot.
+- Seen on the page: 1 km blips are thin lines, hard to see; between Paris and
+  Avignon (657 km, no stop) nothing tells where a bad zone is.
+- Next: make bad zones readable (landmarks or km ticks, minimum stretch
+  length?), a UI smoke test, Stryker.
