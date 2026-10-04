@@ -1,7 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-
-export type Position = { readonly latitude: number; readonly longitude: number };
+import type { Position } from "./geo";
 
 export type TimetabledStop = { readonly name: string; readonly position: Position };
 
