@@ -34,4 +34,24 @@ describe("Laying out the line", () => {
       { name: "Marseille", at: 1 },
     ]);
   });
+
+  it("draws the stretches of the chosen operator, on the same scale", () => {
+    const layout = layOut(
+      train({
+        stretches: {
+          ...train().stretches,
+          Orange: [
+            { fromKm: 0, toKm: 150, level: "Good" },
+            { fromKm: 150, toKm: 600, level: "None" },
+          ],
+        },
+      }),
+      "Orange",
+    );
+
+    expect(layout.stretches).toEqual([
+      { from: 0, to: 0.25, level: "Good" },
+      { from: 0.25, to: 1, level: "None" },
+    ]);
+  });
 });
