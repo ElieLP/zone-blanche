@@ -56,4 +56,16 @@ describe("Webapp", () => {
     );
     expect(root.querySelector("svg")).toBeNull();
   });
+
+  it("says so when the train cannot be loaded", async () => {
+    const root = document.createElement("main");
+
+    await startApp(root, async () => {
+      throw new SyntaxError("Unexpected token < in JSON");
+    });
+
+    expect(root.querySelector("[role=status]")?.textContent).toBe(
+      "Could not load train 6111 on 2026-10-10.",
+    );
+  });
 });

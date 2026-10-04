@@ -47,7 +47,13 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader): Promise<voi
     const date = String(data.get("date"));
     const operator = String(data.get("operator")) as Operator;
     line.innerHTML = "";
-    const train = await loadTrain(trainNumber, date);
+    let train: PreparedTrain | undefined;
+    try {
+      train = await loadTrain(trainNumber, date);
+    } catch {
+      message.textContent = `Could not load train ${trainNumber} on ${date}.`;
+      return;
+    }
     if (!train) {
       message.textContent = `No data prepared for train ${trainNumber} on ${date}.`;
       return;
