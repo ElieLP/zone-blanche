@@ -1,0 +1,5 @@
+stop_id,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station
+StopPoint:OCETGV INOUI-87318964,Avignon TGV,,43.92194000,4.786136000,,,0,StopArea:OCE87318964
+StopPoint:OCETGV INOUI-87319012,Aix-en-Provence TGV,,43.45523700,5.317534000,,,0,StopArea:OCE87319012
+StopPoint:OCETGV INOUI-87686006,Paris Gare de Lyon Hall 1 - 2,,48.84494500,2.373481000,,,0,StopArea:OCE87686006
+StopPoint:OCETGV INOUI-87751008,Marseille Saint-Charles,,43.30266600,5.380407000,,,0,StopArea:OCE87751008
