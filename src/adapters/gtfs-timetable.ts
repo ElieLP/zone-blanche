@@ -1,7 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-export type TimetabledStop = { readonly name: string };
+export type Position = { readonly latitude: number; readonly longitude: number };
+
+export type TimetabledStop = { readonly name: string; readonly position: Position };
 
 export type GtfsTimetable = {
   stopsOf(trainNumber: string, date: string): readonly TimetabledStop[] | undefined;
@@ -15,7 +17,15 @@ export async function loadGtfsTimetable(directory: string): Promise<GtfsTimetabl
       readCsv(join(directory, `${file}.txt`)),
     ),
   );
-  const stopNames = new Map(stops!.map((s) => [s.stop_id, s.stop_name!]));
+  const stopsById = new Map(
+    stops!.map((s) => [
+      s.stop_id,
+      {
+        name: s.stop_name!,
+        position: { latitude: Number(s.stop_lat), longitude: Number(s.stop_lon) },
+      },
+    ]),
+  );
 
   return {
     stopsOf(trainNumber, date) {
@@ -32,7 +42,7 @@ export async function loadGtfsTimetable(directory: string): Promise<GtfsTimetabl
       return stopTimes!
         .filter((st) => st.trip_id === trip.trip_id)
         .sort((a, b) => Number(a.stop_sequence) - Number(b.stop_sequence))
-        .map((st) => ({ name: stopNames.get(st.stop_id!)! }));
+        .map((st) => stopsById.get(st.stop_id!)!);
     },
   };
 }

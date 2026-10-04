@@ -23,4 +23,12 @@ describe("GTFS timetable", () => {
     // The feed covers 2026-10-04 to 2027-03-31; 6111 runs every day in it.
     expect(timetable.stopsOf("6111", "2027-04-01")).toBeUndefined();
   });
+
+  it("gives the coordinates of each stop", async () => {
+    const timetable = await loadGtfsTimetable(fixture);
+
+    const [paris] = timetable.stopsOf("6111", "2026-10-10") ?? [];
+
+    expect(paris?.position).toEqual({ latitude: 48.844945, longitude: 2.373481 });
+  });
 });
