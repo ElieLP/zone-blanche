@@ -9,14 +9,20 @@ const TRAIN_ROUTE = /^\/api\/trains\/([^/]+)\/(\d{4}-\d{2}-\d{2})$/;
 export function trainApi(prepare: TrainPreparer): RequestListener {
   return async (request, response) => {
     const [, trainNumber, date] = TRAIN_ROUTE.exec(request.url ?? "") ?? [];
-    const train = trainNumber && date ? await prepare({ trainNumber, date }) : undefined;
-    if (!train) return notFound(response);
-    response.setHeader("Content-Type", "application/json");
-    response.end(JSON.stringify(train));
+    if (!trainNumber || !date) return answer(response, 404);
+    try {
+      const train = await prepare({ trainNumber, date });
+      if (!train) return answer(response, 404);
+      response.setHeader("Content-Type", "application/json");
+      response.end(JSON.stringify(train));
+    } catch (error) {
+      console.error(`Preparing train ${trainNumber} on ${date} failed`, error);
+      answer(response, 500);
+    }
   };
 }
 
-function notFound(response: ServerResponse): void {
-  response.statusCode = 404;
+function answer(response: ServerResponse, status: number): void {
+  response.statusCode = status;
   response.end();
 }

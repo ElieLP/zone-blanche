@@ -52,6 +52,18 @@ describe("Train API", () => {
     expect(response.status).toBe(404);
   });
 
+  it("answers a server error when the preparation fails", async () => {
+    const url = await serving(async () => {
+      throw new Error("timetable unavailable");
+    });
+
+    const response = await fetch(`${url}/api/trains/6111/2026-10-10`, {
+      signal: AbortSignal.timeout(1000),
+    });
+
+    expect(response.status).toBe(500);
+  });
+
   it.each(["/api/trains/6111", "/api/trains/6111/10-10-2026", "/api/trains/6111/2026-10-10/x"])(
     "answers Not Found for %s without preparing anything",
     async (path) => {
