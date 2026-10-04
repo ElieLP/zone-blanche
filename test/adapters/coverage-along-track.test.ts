@@ -24,4 +24,12 @@ describe("Coverage along a track", () => {
     expect(samples[0]?.atKm).toBeCloseTo(0.01 * KM_PER_DEGREE, 3);
     expect(samples[0]?.level).toBe("Weak");
   });
+
+  it("places a measurement between two distant track points by projecting it on the track", () => {
+    const track = [at(0), at(0.02)];
+
+    const samples = coverageAlongTrack(track, [measured(at(0.015, 0.001))], "Orange");
+
+    expect(samples[0]?.atKm).toBeCloseTo(0.015 * KM_PER_DEGREE, 2);
+  });
 });
