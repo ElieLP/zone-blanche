@@ -66,7 +66,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
       return;
     }
     if (!train) {
-      message.textContent = `No data prepared for train ${trainNumber} on ${shownDate}.`;
+      message.textContent = `Train ${trainNumber} does not run on ${shownDate}.`;
       return;
     }
     const lengthKm = Math.round(train.stops.at(-1)?.atKm ?? 0);
