@@ -24,7 +24,7 @@ export async function loadRawData(dir: string): Promise<Dependencies> {
   };
 }
 
-export async function timed<T>(label: string, work: () => Promise<T>): Promise<T> {
+async function timed<T>(label: string, work: () => Promise<T>): Promise<T> {
   const start = performance.now();
   const result = await work();
   console.log(`${label}: ${Math.round(performance.now() - start)} ms`);
