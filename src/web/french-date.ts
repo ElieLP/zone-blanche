@@ -8,3 +8,8 @@ export function parseFrenchDate(text: string): string | undefined {
   const date = new Date(`${iso}T00:00:00Z`);
   return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(iso) ? iso : undefined;
 }
+
+/** Writes an ISO date the French way, dd/mm/yyyy. */
+export function formatFrenchDate(iso: string): string {
+  return iso.split("-").reverse().join("/");
+}

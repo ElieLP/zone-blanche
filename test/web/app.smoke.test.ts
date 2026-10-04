@@ -29,10 +29,16 @@ describe("Webapp", () => {
   it("shows the pre-filled train as a line with its stops and stretches", async () => {
     const root = document.createElement("main");
 
-    await startApp(root, async () => train6111);
+    const asked: [string, string][] = [];
 
+    await startApp(root, async (trainNumber, date) => {
+      asked.push([trainNumber, date]);
+      return train6111;
+    });
+
+    expect(asked).toEqual([["6111", "2026-10-10"]]);
     expect(root.querySelector("[role=status]")?.textContent).toBe(
-      "Train 6111 on 2026-10-10 with Orange, 750 km.",
+      "Train 6111 on 10/10/2026 with Orange, 750 km.",
     );
     const svg = root.querySelector("svg");
     expect([...(svg?.querySelectorAll("text") ?? [])].map((t) => t.textContent)).toEqual([
@@ -52,7 +58,7 @@ describe("Webapp", () => {
     await startApp(root, async () => undefined);
 
     expect(root.querySelector("[role=status]")?.textContent).toBe(
-      "No data prepared for train 6111 on 2026-10-10.",
+      "No data prepared for train 6111 on 10/10/2026.",
     );
     expect(root.querySelector("svg")).toBeNull();
   });
@@ -65,7 +71,23 @@ describe("Webapp", () => {
     });
 
     expect(root.querySelector("[role=status]")?.textContent).toBe(
-      "Could not load train 6111 on 2026-10-10.",
+      "Could not load train 6111 on 10/10/2026.",
     );
+  });
+
+  it("asks for a dd/mm/yyyy date when the date is not one", async () => {
+    const root = document.createElement("main");
+    let loads = 0;
+    await startApp(root, async () => {
+      loads++;
+      return train6111;
+    });
+
+    root.querySelector<HTMLInputElement>("#date")!.value = "2026-10-10";
+    root.querySelector("form")!.dispatchEvent(new Event("submit", { cancelable: true }));
+
+    expect(root.querySelector("[role=status]")?.textContent).toBe("Enter the date as dd/mm/yyyy.");
+    expect(root.querySelector("svg")).toBeNull();
+    expect(loads).toBe(1);
   });
 });

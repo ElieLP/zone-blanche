@@ -1,5 +1,6 @@
 import type { PreparedTrain } from "../application/prepare-train";
 import { OPERATORS, type ConnectivityLevel, type Operator } from "../domain/model";
+import { formatFrenchDate, parseFrenchDate } from "./french-date";
 import { layOut, type LineLayout } from "./layout";
 
 const LINE_HEIGHT = 2000;
@@ -24,7 +25,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader): Promise<voi
   <h1>Train connectivity</h1>
   <form id="request">
     <label>Train <input id="train" name="train" value="6111" required /></label>
-    <label>Date <input id="date" name="date" type="date" value="2026-10-10" required /></label>
+    <label>Date <input id="date" name="date" value="10/10/2026" placeholder="dd/mm/yyyy" inputmode="numeric" required /></label>
     <label>Operator
       <select id="operator" name="operator">
         ${OPERATORS.map((o) => `<option>${o}</option>`).join("")}
@@ -48,22 +49,27 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader): Promise<voi
   const show = async (): Promise<void> => {
     const data = new FormData(form);
     const trainNumber = String(data.get("train")).trim();
-    const date = String(data.get("date"));
+    const date = parseFrenchDate(String(data.get("date")));
     const operator = String(data.get("operator")) as Operator;
     line.innerHTML = "";
+    if (!date) {
+      message.textContent = "Enter the date as dd/mm/yyyy.";
+      return;
+    }
+    const shownDate = formatFrenchDate(date);
     let train: PreparedTrain | undefined;
     try {
       train = await loadTrain(trainNumber, date);
     } catch {
-      message.textContent = `Could not load train ${trainNumber} on ${date}.`;
+      message.textContent = `Could not load train ${trainNumber} on ${shownDate}.`;
       return;
     }
     if (!train) {
-      message.textContent = `No data prepared for train ${trainNumber} on ${date}.`;
+      message.textContent = `No data prepared for train ${trainNumber} on ${shownDate}.`;
       return;
     }
     const lengthKm = Math.round(train.stops.at(-1)?.atKm ?? 0);
-    message.textContent = `Train ${trainNumber} on ${date} with ${operator}, ${lengthKm} km.`;
+    message.textContent = `Train ${trainNumber} on ${shownDate} with ${operator}, ${lengthKm} km.`;
     line.innerHTML = svgOf(layOut(train, operator));
   };
 
