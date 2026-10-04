@@ -1,0 +1,27 @@
+import { describe, expect, it } from "vitest";
+import type { ArcepMeasurement } from "../../src/adapters/arcep-measurements";
+import { coverageAlongTrack } from "../../src/adapters/coverage-along-track";
+import type { Position } from "../../src/adapters/geo";
+
+/** One degree of latitude is about 111.2 km. */
+const KM_PER_DEGREE = 111.195;
+
+const at = (latitude: number, longitude = 0): Position => ({ latitude, longitude });
+
+const measured = (
+  position: Position,
+  level: ArcepMeasurement["level"] = "Good",
+  operator: ArcepMeasurement["operator"] = "Orange",
+): ArcepMeasurement => ({ operator, position, level });
+
+describe("Coverage along a track", () => {
+  it("places a measurement taken on a track point at that point's distance", () => {
+    const track = [at(0), at(0.01), at(0.02)];
+
+    const samples = coverageAlongTrack(track, [measured(at(0.01), "Weak")], "Orange");
+
+    expect(samples).toHaveLength(1);
+    expect(samples[0]?.atKm).toBeCloseTo(0.01 * KM_PER_DEGREE, 3);
+    expect(samples[0]?.level).toBe("Weak");
+  });
+});
