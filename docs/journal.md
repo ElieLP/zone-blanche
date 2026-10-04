@@ -246,3 +246,19 @@
   text stays readable on a phone. Checked by headless Chromium screenshots
   (6111, 3645, light/dark, 390 px).
 - Next: shareable URL (train/date/operator in the query string)?
+
+## 2026-10-04 — Memory below 512 MB
+
+- Goal: fit free or tiny hosting tiers (512 MB). Before: 1.2 GB peak, 850 MB steady.
+- Findings (heap snapshots):
+  - `split(/\r?\n/)` on a file left the whole file referenced by V8's last
+    regex match: the 246 MB ARCEP CSV lived as long as the server.
+  - Substrings keep their whole source text alive: GTFS rows kept the 85 MB
+    `stop_times.txt` in memory.
+- Fixes: files read line by line; timetable indexed by train number at load
+  (no stop_times string kept; no full scan per request); ARCEP measurements as
+  number columns; heap capped at 256 MB (`npm run serve`).
+- After: ~190 MB of live heap, peak 490 MB, steady 350–430 MB; load ~3.5 s,
+  ~1 s per train, same output.
+- Watch: a bigger yearly ARCEP file could exceed the 256 MB cap (the API then
+  fails at startup, loudly).
