@@ -16,7 +16,8 @@ export function coverageAlongTrack(
   for (let i = 1; i < track.length; i++) {
     kmAt.push(kmAt[i - 1]! + distanceKm(track[i - 1]!, track[i]!));
   }
-  return measurements.flatMap(({ position, level }) => {
+  return measurements.flatMap(({ operator: measuredBy, position, level }) => {
+    if (measuredBy !== operator) return [];
     let best = { offsetKm: Infinity, atKm: 0 };
     for (let i = 1; i < track.length; i++) {
       const { offsetKm, along } = projectOnSegment(position, track[i - 1]!, track[i]!);

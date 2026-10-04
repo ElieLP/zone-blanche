@@ -45,4 +45,16 @@ describe("Coverage along a track", () => {
 
     expect(samples.map((s) => s.level)).toEqual(["Good"]);
   });
+
+  it("keeps only the measurements of the chosen operator", () => {
+    const track = [at(0), at(0.02)];
+
+    const samples = coverageAlongTrack(
+      track,
+      [measured(at(0.01), "None", "SFR"), measured(at(0.01), "Good", "Orange")],
+      "Orange",
+    );
+
+    expect(samples.map((s) => s.level)).toEqual(["Good"]);
+  });
 });
