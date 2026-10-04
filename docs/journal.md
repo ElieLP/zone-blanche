@@ -154,3 +154,22 @@
     index for junctions brought it under 0.1 s.
 - Next: a `JourneyRepository` adapter combining GTFS stops and the rail network
   into a domain `Journey`, then project ARCEP measurements onto the track.
+
+## 2026-10-04 — Journey repository, ARCEP spike
+
+- `SncfJourneys` (GTFS + rail network) implements `JourneyRepository`: 6111 on
+  2026-10-10 gives Paris 0, Avignon ≈ 657, Aix ≈ 732, Marseille ≈ 750 km.
+- ARCEP spike on `2025_QoS_Metropole_data_transports.csv` (919k rows), points
+  within 1 km of the 6111 track:
+  - TGV axis only has `protocole=WEB`. The four operators are measured at the
+    same points (one rig, four SIMs): ~16k samples each along 6111, from 12
+    axes sharing the line (Paris–Lyon, Paris–Marseille, Paris–Grenoble…),
+    31 days in May–July 2025.
+  - Distance to the track: median 100 m, p99 875 m.
+  - `loaded_in_less_5_secondes` / `_10_` map straight to 3 levels:
+    1|1 Good, 0|1 Weak, 0|0 None. Orange: 74 % Good, 15 % Weak, 11 % None.
+  - Density: median 19 samples per km per operator; 694 of 751 km have at
+    least one, the gaps are isolated single kilometres.
+  - **Worst wins is unusable at this density**: Orange becomes None on 567 of
+    694 km (one failed page load in 19 is enough). Majority gives 643 Good,
+    26 Weak, 25 None. Open decision 2 needs revisiting.
