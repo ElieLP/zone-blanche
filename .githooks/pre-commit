@@ -1,0 +1,8 @@
+#!/bin/sh
+# Every commit must be green: formatting, types and tests.
+checks="npm run --silent lint && npm run --silent typecheck && npm test --silent"
+if command -v npm >/dev/null 2>&1; then
+  sh -c "$checks"
+else
+  nix-shell --run "$checks"
+fi
