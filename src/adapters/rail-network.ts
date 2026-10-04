@@ -9,6 +9,8 @@ export type SpeedSection = {
 export type RouteAlongTrack = {
   readonly lengthKm: number;
   readonly stopsAtKm: readonly number[];
+  /** Positions followed from the first stop to the last. */
+  readonly track: readonly Position[];
 };
 
 export type RailNetwork = {
@@ -65,10 +67,21 @@ export function buildRailNetwork(sections: readonly SpeedSection[]): RailNetwork
         (stop) => nearestVertex(vertices, vertices.keys(), stop, () => true) ?? 0,
       );
       const stopsAtKm = [0];
+      const track: Position[] = [];
+      const follow = (vertex: number) => {
+        const { position } = vertices[vertex]!;
+        const last = track.at(-1);
+        if (last?.latitude !== position.latitude || last.longitude !== position.longitude) {
+          track.push(position);
+        }
+      };
+      follow(snapped[0]!);
       for (let i = 1; i < snapped.length; i++) {
-        stopsAtKm.push(stopsAtKm[i - 1]! + fastestPathKm(edges, snapped[i - 1]!, snapped[i]!));
+        const leg = fastestPath(edges, snapped[i - 1]!, snapped[i]!);
+        stopsAtKm.push(stopsAtKm[i - 1]! + leg.km);
+        leg.vertices.forEach(follow);
       }
-      return { lengthKm: stopsAtKm.at(-1)!, stopsAtKm };
+      return { lengthKm: stopsAtKm.at(-1)!, stopsAtKm, track };
     },
   };
 }
@@ -126,9 +139,13 @@ class VertexGrid {
   }
 }
 
-/** Dijkstra on travel time; returns the length of the fastest path. */
-function fastestPathKm(edges: readonly Edge[][], from: number, to: number): number {
-  const best = new Map([[from, { hours: 0, km: 0 }]]);
+/** Dijkstra on travel time: the fastest path, its length and the vertices after `from`. */
+function fastestPath(
+  edges: readonly Edge[][],
+  from: number,
+  to: number,
+): { km: number; vertices: number[] } {
+  const best = new Map([[from, { hours: 0, km: 0, previous: from }]]);
   const done = new Set<number>();
   const queue = new MinHeap<number>();
   queue.push(0, from);
@@ -136,12 +153,16 @@ function fastestPathKm(edges: readonly Edge[][], from: number, to: number): numb
     const current = queue.pop()!;
     if (done.has(current)) continue;
     const reached = best.get(current)!;
-    if (current === to) return reached.km;
+    if (current === to) {
+      const vertices: number[] = [];
+      for (let v = to; v !== from; v = best.get(v)!.previous) vertices.unshift(v);
+      return { km: reached.km, vertices };
+    }
     done.add(current);
     for (const edge of edges[current]!) {
       const hours = reached.hours + edge.hours;
       if (hours < (best.get(edge.to)?.hours ?? Infinity)) {
-        best.set(edge.to, { hours, km: reached.km + edge.km });
+        best.set(edge.to, { hours, km: reached.km + edge.km, previous: current });
         queue.push(hours, edge.to);
       }
     }

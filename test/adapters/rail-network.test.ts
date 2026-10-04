@@ -61,4 +61,15 @@ describe("Rail network", () => {
 
     expect(route.lengthKm).toBeCloseTo(2 * distanceKm(at(0), detour), 1);
   });
+
+  it("gives the track the route follows, from the first stop to the last", () => {
+    const network = buildRailNetwork([
+      section(160, at(0), at(0.5), at(1)),
+      section(160, at(1), at(1.5), at(2)),
+    ]);
+
+    const route = network.routeThrough([at(0.5), at(1.5)]);
+
+    expect(route.track).toEqual([at(0.5), at(1), at(1.5)]);
+  });
 });
