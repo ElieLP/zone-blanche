@@ -1,4 +1,4 @@
-import type { ConnectivityLevel, Operator } from "../domain/model";
+import { OPERATORS, type ConnectivityLevel, type Operator } from "../domain/model";
 import type { Position } from "./geo";
 
 export type ArcepMeasurement = {
@@ -16,7 +16,7 @@ export function parseArcepMeasurements(csv: string): ArcepMeasurement[] {
     const field = (name: string) => values[names.indexOf(name)] ?? "";
     if (field("situation") !== "INTRAIN") return [];
     return {
-      operator: field("operator") as Operator,
+      operator: operatorOf(field("operator")),
       position: {
         latitude: Number(field("latitude_start")),
         longitude: Number(field("longitude_start")),
@@ -24,6 +24,12 @@ export function parseArcepMeasurements(csv: string): ArcepMeasurement[] {
       level: levelOf(field("loaded_in_less_5_secondes"), field("loaded_in_less_10_secondes")),
     };
   });
+}
+
+function operatorOf(name: string): Operator {
+  const operator = OPERATORS.find((o) => o === name);
+  if (!operator) throw new Error(`Unknown operator ${name}`);
+  return operator;
 }
 
 /** Decision 4: under 5 s is Good, under 10 s is Weak, slower or failed is None. */

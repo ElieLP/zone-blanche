@@ -28,4 +28,10 @@ describe("ARCEP on-train measurements", () => {
 
     expect(parseArcepMeasurements(csv)).toEqual([]);
   });
+
+  it("rejects an operator it does not know", () => {
+    const csv = [header, "tgv;48.84484;1;1;2.37549;Lebara;INTRAIN"].join("\n");
+
+    expect(() => parseArcepMeasurements(csv)).toThrow(/Unknown operator Lebara/);
+  });
 });
