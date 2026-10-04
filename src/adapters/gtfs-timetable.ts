@@ -1,3 +1,4 @@
+import { linesOf } from "./lines";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { Position } from "../domain/model";
@@ -56,7 +57,7 @@ async function readCsv<Column extends string>(
   path: string,
   columns: readonly Column[],
 ): Promise<Record<Column, string>[]> {
-  const [header = "", ...lines] = (await readFile(path, "utf8")).trim().split(/\r?\n/);
+  const [header = "", ...lines] = linesOf(await readFile(path, "utf8"));
   const names = header.split(",");
   const indexes = columns.map((column) => {
     const index = names.indexOf(column);

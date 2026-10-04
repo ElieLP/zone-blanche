@@ -7,7 +7,7 @@ const fixture = new URL("./fixtures/arcep-tgv-paris-marseille.csv", import.meta.
 
 describe("ARCEP measurements on real data", () => {
   it("reads every TGV Paris–Marseille measurement, about a quarter per operator", async () => {
-    const measurements = parseArcepMeasurements(await readFile(fixture, "utf8"));
+    const measurements = [...parseArcepMeasurements(await readFile(fixture, "utf8"))];
 
     expect(measurements).toHaveLength(10611);
     for (const operator of OPERATORS) {

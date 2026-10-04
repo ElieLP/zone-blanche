@@ -1,3 +1,4 @@
+import { linesOf } from "./lines";
 import { OPERATORS, type ConnectivityLevel, type Operator, type Position } from "../domain/model";
 
 export type ArcepMeasurement = {
@@ -16,9 +17,39 @@ const COLUMNS = [
 ] as const;
 type Column = (typeof COLUMNS)[number];
 
+const LEVELS = ["Good", "Weak", "None"] as const satisfies readonly ArcepMeasurement["level"][];
+
+/**
+ * Hundreds of thousands of measurements, kept as plain number columns (a few bytes
+ * each, rather than an object per measurement); read back one measurement at a time.
+ */
+export class ArcepMeasurements implements Iterable<ArcepMeasurement> {
+  private readonly operators: number[] = [];
+  private readonly latitudes: number[] = [];
+  private readonly longitudes: number[] = [];
+  private readonly levels: number[] = [];
+
+  add({ operator, position, level }: ArcepMeasurement): void {
+    this.operators.push(OPERATORS.indexOf(operator));
+    this.latitudes.push(position.latitude);
+    this.longitudes.push(position.longitude);
+    this.levels.push(LEVELS.indexOf(level));
+  }
+
+  *[Symbol.iterator](): Iterator<ArcepMeasurement> {
+    for (let i = 0; i < this.levels.length; i++) {
+      yield {
+        operator: OPERATORS[this.operators[i]!]!,
+        position: { latitude: this.latitudes[i]!, longitude: this.longitudes[i]! },
+        level: LEVELS[this.levels[i]!]!,
+      };
+    }
+  }
+}
+
 /** Reads ARCEP "Mon réseau mobile" QoS transport data: `;`-separated, no quoted fields. */
-export function parseArcepMeasurements(csv: string): ArcepMeasurement[] {
-  const [header = "", ...lines] = csv.trim().split(/\r?\n/);
+export function parseArcepMeasurements(csv: string): ArcepMeasurements {
+  const [header = "", ...lines] = linesOf(csv);
   const names = header.split(";");
   const indexes = new Map(
     COLUMNS.map((column) => {
@@ -27,19 +58,21 @@ export function parseArcepMeasurements(csv: string): ArcepMeasurement[] {
       return [column, index];
     }),
   );
-  return lines.flatMap((line) => {
+  const measurements = new ArcepMeasurements();
+  for (const line of lines) {
     const values = line.split(";");
     const field = (column: Column) => values[indexes.get(column) ?? -1] ?? "";
-    if (field("situation") !== "INTRAIN") return [];
-    return {
+    if (field("situation") !== "INTRAIN") continue;
+    measurements.add({
       operator: operatorOf(field("operator")),
       position: {
         latitude: Number(field("latitude_start")),
         longitude: Number(field("longitude_start")),
       },
       level: levelOf(field("loaded_in_less_5_secondes"), field("loaded_in_less_10_secondes")),
-    };
-  });
+    });
+  }
+  return measurements;
 }
 
 function operatorOf(name: string): Operator {

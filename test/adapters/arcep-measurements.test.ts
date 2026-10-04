@@ -8,7 +8,7 @@ describe("ARCEP on-train measurements", () => {
   it("reads a page loaded in under 5 seconds as Good", () => {
     const csv = `${header}\ntgv;48.84484;1;1;2.37549;Orange;INTRAIN\n`;
 
-    expect(parseArcepMeasurements(csv)).toEqual([
+    expect([...parseArcepMeasurements(csv)]).toEqual([
       { operator: "Orange", position: { latitude: 48.84484, longitude: 2.37549 }, level: "Good" },
     ]);
   });
@@ -20,19 +20,19 @@ describe("ARCEP on-train measurements", () => {
       "tgv;48.84484;0;0;2.37549;Orange;INTRAIN",
     ].join("\n");
 
-    expect(parseArcepMeasurements(csv).map((m) => m.level)).toEqual(["Weak", "None"]);
+    expect([...parseArcepMeasurements(csv)].map((m) => m.level)).toEqual(["Weak", "None"]);
   });
 
   it("ignores measurements taken outside a train", () => {
     const csv = [header, "routes;48.84484;1;1;2.37549;Orange;INCAR"].join("\n");
 
-    expect(parseArcepMeasurements(csv)).toEqual([]);
+    expect([...parseArcepMeasurements(csv)]).toEqual([]);
   });
 
   it("rejects an operator it does not know", () => {
     const csv = [header, "tgv;48.84484;1;1;2.37549;Lebara;INTRAIN"].join("\n");
 
-    expect(() => parseArcepMeasurements(csv)).toThrow(/Unknown operator Lebara/);
+    expect(() => [...parseArcepMeasurements(csv)]).toThrow(/Unknown operator Lebara/);
   });
 
   it("rejects a file without a column it needs", () => {
@@ -41,6 +41,8 @@ describe("ARCEP on-train measurements", () => {
       "tgv;48.8;1;1;2.3;Orange;INTRAIN",
     ].join("\n");
 
-    expect(() => parseArcepMeasurements(csv)).toThrow(/Missing column loaded_in_less_5_secondes/);
+    expect(() => [...parseArcepMeasurements(csv)]).toThrow(
+      /Missing column loaded_in_less_5_secondes/,
+    );
   });
 });
