@@ -83,3 +83,30 @@
 - The machine is aarch64 (Asahi): some packages aren't in the binary cache and
   get built from source (duckdb took about 12 min the first time; it's in the
   store now).
+
+## 2026-10-04 — Stack & architecture decisions
+
+### Decision: offline preparation + static web app
+- Offline step (adapters) reads SNCF GTFS, the RFN line shapes and the ARCEP CSV,
+  and writes compact JSON (routes, measurements matched to their position along
+  each route).
+- Static web app: loads the JSON, runs the pure domain, draws the line.
+  No backend, no runtime API calls.
+
+### Decision: TypeScript everywhere
+- One language and one toolchain; domain types written once and used by both
+  the offline step and the web app.
+- Offline step: Node scripts. Geo work (snap to line, distance along it,
+  shortest path) with turf.js or written by hand.
+- Web app: Vite + plain TS + SVG, no UI framework.
+- Tests: Vitest (unit + acceptance), fast-check (property tests, e.g. C4),
+  Stryker (mutation testing).
+- Environment: `shell.nix` with `nodejs`.
+- Python rejected: better geo libraries, but a second language and duplicated
+  domain types.
+
+### Walking skeleton plan
+1. `shell.nix` + TS project + Vitest.
+2. Failing acceptance test from `domain.md` with in-memory fakes of both ports.
+3. Make it pass with the pure domain, then real adapters one at a time,
+   starting with route reconstruction for train 6111.
