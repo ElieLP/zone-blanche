@@ -3,6 +3,8 @@ import type { ArcepMeasurement } from "./arcep-measurements";
 import { distanceKm, type Position } from "./geo";
 
 const KM_PER_DEGREE = (6371 * Math.PI) / 180;
+/** Measurements further from the track were likely taken on another line. */
+const MAX_OFFSET_KM = 1;
 
 /** Places each measurement of the operator at its distance along the track. */
 export function coverageAlongTrack(
@@ -14,7 +16,7 @@ export function coverageAlongTrack(
   for (let i = 1; i < track.length; i++) {
     kmAt.push(kmAt[i - 1]! + distanceKm(track[i - 1]!, track[i]!));
   }
-  return measurements.map(({ position, level }) => {
+  return measurements.flatMap(({ position, level }) => {
     let best = { offsetKm: Infinity, atKm: 0 };
     for (let i = 1; i < track.length; i++) {
       const { offsetKm, along } = projectOnSegment(position, track[i - 1]!, track[i]!);
@@ -22,7 +24,7 @@ export function coverageAlongTrack(
         best = { offsetKm, atKm: kmAt[i - 1]! + along * (kmAt[i]! - kmAt[i - 1]!) };
       }
     }
-    return { atKm: best.atKm, level };
+    return best.offsetKm <= MAX_OFFSET_KM ? [{ atKm: best.atKm, level }] : [];
   });
 }
 

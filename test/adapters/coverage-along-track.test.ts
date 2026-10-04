@@ -32,4 +32,17 @@ describe("Coverage along a track", () => {
 
     expect(samples[0]?.atKm).toBeCloseTo(0.015 * KM_PER_DEGREE, 2);
   });
+
+  it("ignores a measurement more than 1 km from the track, likely taken on another line", () => {
+    const track = [at(0), at(0.02)];
+    const kmEast = (km: number) => at(0.01, km / KM_PER_DEGREE);
+
+    const samples = coverageAlongTrack(
+      track,
+      [measured(kmEast(0.9), "Good"), measured(kmEast(1.1), "None")],
+      "Orange",
+    );
+
+    expect(samples.map((s) => s.level)).toEqual(["Good"]);
+  });
 });
