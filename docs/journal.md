@@ -173,3 +173,26 @@
   - **Worst wins is unusable at this density**: Orange becomes None on 567 of
     694 km (one failed page load in 19 is enough). Majority gives 643 Good,
     26 Weak, 25 None. Open decision 2 needs revisiting.
+
+## 2026-10-04 — Majority rule, ARCEP adapter, first real end-to-end line
+
+- Decision 2: **majority wins** in a kilometre, a tie goes to the worse level.
+- ARCEP adapter: `parseArcepMeasurements` (in-train rows only, fails fast on an
+  unknown operator or a missing column) and `coverageAlongTrack` (projects each
+  measurement onto the track segments, drops those more than 1 km away).
+  - Snapping to the nearest track point wasn't enough: the 6111 track has 103
+    gaps over 1 km between points, up to 2.9 km.
+- Decision 4 applied as the candidate: under 5 s Good, under 10 s Weak, else
+  None. Still to confirm.
+- `Journey` now carries its track; `Position` moved into the domain model.
+- First line from real data, 6111 Orange, fixture = the "TGV PARIS - MARSEILLE"
+  axis only (~3.5 samples/km): Good 447 km, Weak 111, None 92, Unknown 100, in
+  **436 stretches**. Too fragmented to read.
+  - The spike with all 12 axes sharing the line (~19 samples/km) gave 643 Good,
+    26 Weak, 25 None: the preparation step should use every TGV axis near the
+    track, not only the train's own.
+  - Projection is brute force (measurements × segments): ~0.8 s for 10k rows,
+    fine offline. Optimise only if the preparation step gets slow.
+- Next: the offline preparation script (full GTFS + speed sections + ARCEP →
+  JSON per train), then the SVG page. Open: decision 3 (display scale), and
+  whether 1 km chunks are too fine for a readable line.
