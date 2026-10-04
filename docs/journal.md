@@ -138,3 +138,19 @@
   →Marseille 19 km; **750 km in total**, which matches the real line.
 - Decision: build the route graph from the speed sections, route by travel time,
   200 m end-linking. Stops snap to the nearest vertex.
+
+## 2026-10-04 — Route reconstruction, test-driven
+
+- `buildRailNetwork(speedSections).routeThrough(stopPositions)` gives the
+  route length, each stop's km and the track followed. Unit tests on tiny
+  synthetic networks; contract tests on real data for train 6111.
+- Real-data surprises:
+  - The first fixture (40 km around the straight Paris→Avignon line) dropped
+    the middle of the LGV, which bends ~90 km east near Mâcon. The corridor
+    now goes through Mâcon and Lyon.
+  - Total km can't tell LGV from classic line (657 vs 654 km to Avignon). The
+    contract test checks the track passes Lyon Saint-Exupéry instead.
+  - Linear scans took 13 s on 43k vertices; a binary heap plus a 0.01° grid
+    index for junctions brought it under 0.1 s.
+- Next: a `JourneyRepository` adapter combining GTFS stops and the rail network
+  into a domain `Journey`, then project ARCEP measurements onto the track.
