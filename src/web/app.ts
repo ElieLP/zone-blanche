@@ -55,11 +55,22 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
 
   let shown: PreparedTrain | undefined;
 
+  const say = (text: string): void => {
+    message.textContent = text;
+    message.classList.remove("error");
+  };
+  const fail = (text: string): void => {
+    say(text);
+    message.classList.add("error");
+  };
+
   const draw = (): void => {
     if (!shown) return;
     const operator = String(new FormData(form).get("operator")) as Operator;
     const lengthKm = Math.round(shown.stops.at(-1)?.atKm ?? 0);
-    message.textContent = `Train ${shown.trainNumber} on ${formatFrenchDate(shown.date)} with ${operator}, ${lengthKm} km.`;
+    say(
+      `Train ${shown.trainNumber} on ${formatFrenchDate(shown.date)} with ${operator}, ${lengthKm} km.`,
+    );
     line.innerHTML = LEGEND + svgOf(layOut(shown, operator));
   };
 
@@ -78,19 +89,21 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     line.innerHTML = "";
     compare();
     if (!date) {
-      message.textContent = "Enter the date as dd/mm/yyyy.";
+      fail("Enter the date as dd/mm/yyyy.");
       return;
     }
     const shownDate = formatFrenchDate(date);
-    message.textContent = `Preparing train ${trainNumber} on ${shownDate}…`;
+    say(`Preparing train ${trainNumber} on ${shownDate}…`);
     try {
       shown = await loadTrain(trainNumber, date);
     } catch {
-      message.textContent = `Server error: could not prepare train ${trainNumber} on ${shownDate}. Try again later.`;
+      fail(
+        `Server error: could not prepare train ${trainNumber} on ${shownDate}. Try again later.`,
+      );
       return;
     }
     if (!shown) {
-      message.textContent = `Train ${trainNumber} does not run on ${shownDate}.`;
+      say(`Train ${trainNumber} does not run on ${shownDate}.`);
       return;
     }
     compare();

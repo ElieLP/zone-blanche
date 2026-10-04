@@ -151,6 +151,24 @@ describe("Webapp", () => {
     );
   });
 
+  it("styles a failure as an error, until a train shows", async () => {
+    let fails = true;
+    const root = appWith(async () => {
+      if (fails) throw new Error("Train API answered 502 Bad Gateway");
+      return train6111;
+    });
+    const isError = () => root.querySelector("[role=status]")?.classList.contains("error");
+
+    await ask(root, "6111");
+    const afterFailure = isError();
+    await ask(root, "6111", "2026-10-10");
+    const afterBadDate = isError();
+    fails = false;
+    await ask(root, "6111");
+
+    expect([afterFailure, afterBadDate, isError()]).toEqual([true, true, false]);
+  });
+
   it("asks for a dd/mm/yyyy date when the date is not one", async () => {
     let loads = 0;
     const root = appWith(async () => {
