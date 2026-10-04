@@ -8,6 +8,9 @@ import type {
 
 const CHUNK_KM = 1;
 
+/** Breaks ties between equally common levels: the worse one wins. */
+const SEVERITY: Record<ConnectivityLevel, number> = { Unknown: -1, Good: 0, Weak: 1, None: 2 };
+
 export function buildConnectivityLine(
   journey: Journey,
   samples: readonly CoverageSample[],
@@ -31,7 +34,7 @@ function mostCommonOf(samples: readonly CoverageSample[]): ConnectivityLevel {
   let mostCommon: ConnectivityLevel = "Unknown";
   let highest = 0;
   for (const [level, count] of counts) {
-    if (count > highest) {
+    if (count > highest || (count === highest && SEVERITY[level] > SEVERITY[mostCommon])) {
       mostCommon = level;
       highest = count;
     }

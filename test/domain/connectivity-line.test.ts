@@ -46,6 +46,12 @@ describe("Building the connectivity line", () => {
     ]);
   });
 
+  it("breaks a tie towards the worse level", () => {
+    const line = buildConnectivityLine(journeyOf(1), [sample(0.2, "Good"), sample(0.8, "None")]);
+
+    expect(line.stretches).toEqual([{ fromKm: 0, toKm: 1, level: "None" }]);
+  });
+
   it("merges consecutive kilometres with the same level into one stretch", () => {
     const line = buildConnectivityLine(journeyOf(3), [
       sample(0.5, "None"),
