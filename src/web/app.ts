@@ -2,8 +2,12 @@ import type { PreparedTrain } from "../application/prepare-train";
 import { OPERATORS, type ConnectivityLevel, type Operator } from "../domain/model";
 import { layOut, type LineLayout } from "./layout";
 
-const LINE_HEIGHT = 900;
+const LINE_HEIGHT = 2000;
 const MARGIN = 24;
+const WIDTH = 600;
+const BAR_X = 20;
+const BAR_WIDTH = 40;
+const BAR_CENTRE = BAR_X + BAR_WIDTH / 2;
 const LEVEL_COLOURS: Record<ConnectivityLevel, string> = {
   Good: "#2e8a57",
   Weak: "#e0a325",
@@ -75,17 +79,17 @@ function svgOf({ stops, stretches }: LineLayout): string {
   const bars = stretches
     .map(
       ({ from, to, level }) =>
-        `<rect x="20" y="${y(from)}" width="12" height="${y(to) - y(from)}" fill="${LEVEL_COLOURS[level]}"><title>${level}</title></rect>`,
+        `<rect x="${BAR_X}" y="${y(from)}" width="${BAR_WIDTH}" height="${y(to) - y(from)}" fill="${LEVEL_COLOURS[level]}"><title>${level}</title></rect>`,
     )
     .join("");
   const markers = stops
     .map(
       ({ name, at }) =>
-        `<circle cx="26" cy="${y(at)}" r="8" class="stop" />` +
-        `<text x="44" y="${y(at)}" dominant-baseline="middle">${escape(name)}</text>`,
+        `<circle cx="${BAR_CENTRE}" cy="${y(at)}" r="16" class="stop" />` +
+        `<text x="${BAR_X + BAR_WIDTH + 20}" y="${y(at)}" dominant-baseline="middle">${escape(name)}</text>`,
     )
     .join("");
-  return `<svg viewBox="0 0 400 ${LINE_HEIGHT + 2 * MARGIN}" role="img" aria-label="Connectivity along the line">${bars}${markers}</svg>`;
+  return `<svg viewBox="0 0 ${WIDTH} ${LINE_HEIGHT + 2 * MARGIN}" role="img" aria-label="Connectivity along the line">${bars}${markers}</svg>`;
 }
 
 function escape(text: string): string {
