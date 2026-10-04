@@ -11,7 +11,7 @@
     "format": "prettier --write .",
     "lint": "prettier --check .",
     "prepare": "git config core.hooksPath .githooks",
-    "serve": "tsx src/server/main.ts",
+    "serve": "node --max-old-space-size=256 --import tsx src/server/main.ts",
     "dev": "vite",
     "build": "vite build"
   },
