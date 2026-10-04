@@ -3,6 +3,9 @@ import type { Position } from "../domain/model";
 const EARTH_RADIUS_KM = 6371;
 const radians = (degrees: number) => (degrees * Math.PI) / 180;
 
+/** Length of one degree of latitude, about 111.2 km. */
+export const KM_PER_DEGREE = radians(EARTH_RADIUS_KM);
+
 /** Great-circle (haversine) distance. */
 export function distanceKm(a: Position, b: Position): number {
   const dLat = radians(b.latitude - a.latitude);

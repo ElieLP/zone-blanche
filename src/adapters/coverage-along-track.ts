@@ -1,8 +1,7 @@
 import type { CoverageSample, Operator, Position } from "../domain/model";
 import type { ArcepMeasurement } from "./arcep-measurements";
-import { distanceKm } from "./geo";
+import { distanceKm, KM_PER_DEGREE } from "./geo";
 
-const KM_PER_DEGREE = (6371 * Math.PI) / 180;
 /** Measurements further from the track were likely taken on another line. */
 const MAX_OFFSET_KM = 1;
 
