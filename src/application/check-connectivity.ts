@@ -1,3 +1,4 @@
+import { buildConnectivityLine } from "../domain/connectivity-line";
 import type { ConnectivityLine, Operator } from "../domain/model";
 import type { CoverageSource, JourneyRepository } from "./ports";
 
@@ -13,8 +14,11 @@ export type ConnectivityRequest = {
 };
 
 export async function checkConnectivity(
-  _dependencies: Dependencies,
-  _request: ConnectivityRequest,
+  { journeys, coverage }: Dependencies,
+  { trainNumber, date, operator }: ConnectivityRequest,
 ): Promise<ConnectivityLine> {
-  throw new Error("not implemented");
+  const journey = await journeys.find(trainNumber, date);
+  if (!journey) throw new Error(`No journey for train ${trainNumber} on ${date}`);
+  const samples = await coverage.samplesAlong(journey, operator);
+  return buildConnectivityLine(journey, samples);
 }
