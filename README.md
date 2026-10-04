@@ -1,4 +1,4 @@
-# Train connectivity
+# Zone blanche
 
 Mobile coverage along a French train journey: enter a train number and a date,
 see the line of its stops coloured by connectivity (Good / Weak / None /
