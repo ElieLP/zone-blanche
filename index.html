@@ -4,6 +4,54 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Train connectivity</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        margin: 0 auto;
+        max-width: 40rem;
+        padding: 1rem;
+      }
+      form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: end;
+      }
+      label {
+        display: grid;
+        gap: 0.25rem;
+        font-size: 0.9rem;
+      }
+      .legend {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+      .legend i {
+        display: inline-block;
+        width: 0.8rem;
+        height: 0.8rem;
+        border-radius: 50%;
+        margin-right: 0.3rem;
+      }
+      svg {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+      }
+      svg text {
+        font-size: 14px;
+        fill: currentColor;
+      }
+      .stop {
+        fill: Canvas;
+        stroke: CanvasText;
+        stroke-width: 3;
+      }
+    </style>
   </head>
   <body>
     <main id="app"></main>
