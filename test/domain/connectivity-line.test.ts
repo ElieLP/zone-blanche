@@ -30,19 +30,19 @@ describe("Building the connectivity line", () => {
     ]);
   });
 
-  it("gives a kilometre the worst level sampled in it", () => {
-    const line = buildConnectivityLine(journeyOf(3), [
+  it("gives a kilometre the level most of its samples have", () => {
+    const line = buildConnectivityLine(journeyOf(2), [
       sample(0.2, "Good"),
-      sample(0.8, "Weak"),
-      sample(1.2, "None"),
+      sample(0.5, "None"),
+      sample(0.8, "Good"),
+      sample(1.2, "Weak"),
+      sample(1.5, "Good"),
       sample(1.8, "Weak"),
-      sample(2.5, "Good"),
     ]);
 
     expect(line.stretches).toEqual([
-      { fromKm: 0, toKm: 1, level: "Weak" },
-      { fromKm: 1, toKm: 2, level: "None" },
-      { fromKm: 2, toKm: 3, level: "Good" },
+      { fromKm: 0, toKm: 1, level: "Good" },
+      { fromKm: 1, toKm: 2, level: "Weak" },
     ]);
   });
 

@@ -8,10 +8,6 @@ import type {
 
 const CHUNK_KM = 1;
 
-type MeasuredLevel = Exclude<ConnectivityLevel, "Unknown">;
-
-const SEVERITY: Record<MeasuredLevel, number> = { Good: 0, Weak: 1, None: 2 };
-
 export function buildConnectivityLine(
   journey: Journey,
   samples: readonly CoverageSample[],
@@ -25,18 +21,22 @@ function chunksOf(journey: Journey, samples: readonly CoverageSample[]): Stretch
     const fromKm = i * CHUNK_KM;
     const toKm = Math.min(fromKm + CHUNK_KM, journey.lengthKm);
     const inside = samples.filter((s) => fromKm <= s.atKm && s.atKm < toKm);
-    return { fromKm, toKm, level: worstOf(inside) };
+    return { fromKm, toKm, level: mostCommonOf(inside) };
   });
 }
 
-function worstOf(samples: readonly CoverageSample[]): ConnectivityLevel {
-  return samples
-    .map((s) => s.level)
-    .filter((level): level is MeasuredLevel => level !== "Unknown")
-    .reduce<ConnectivityLevel>(
-      (worst, level) => (worst === "Unknown" || SEVERITY[level] > SEVERITY[worst] ? level : worst),
-      "Unknown",
-    );
+function mostCommonOf(samples: readonly CoverageSample[]): ConnectivityLevel {
+  const counts = new Map<ConnectivityLevel, number>();
+  for (const { level } of samples) counts.set(level, (counts.get(level) ?? 0) + 1);
+  let mostCommon: ConnectivityLevel = "Unknown";
+  let highest = 0;
+  for (const [level, count] of counts) {
+    if (count > highest) {
+      mostCommon = level;
+      highest = count;
+    }
+  }
+  return mostCommon;
 }
 
 function merge(chunks: readonly Stretch[]): Stretch[] {
