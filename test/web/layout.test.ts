@@ -3,6 +3,8 @@ import type { PreparedTrain } from "../../src/application/prepare-train";
 import type { Stretch } from "../../src/domain/model";
 import { layOut } from "../../src/web/layout";
 
+const stop = (name: string, atKm: number) => ({ name, atKm });
+
 const unknownAlong = (lengthKm: number): Stretch[] => [
   { fromKm: 0, toKm: lengthKm, level: "Unknown" },
 ];
@@ -53,5 +55,22 @@ describe("Laying out the line", () => {
       { from: 0, to: 0.25, level: "Good" },
       { from: 0.25, to: 1, level: "None" },
     ]);
+  });
+});
+
+describe("Marking the distance along the line", () => {
+  it("marks every 50 km on a long journey", () => {
+    const layout = layOut(train({ stops: [stop("Paris", 0), stop("Marseille", 750)] }), "Orange");
+
+    expect(layout.ticks.map(({ km }) => km)).toEqual([
+      50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700,
+    ]);
+    expect(layout.ticks[0]).toEqual({ km: 50, at: 50 / 750 });
+  });
+
+  it("marks more often on a short journey", () => {
+    const layout = layOut(train({ stops: [stop("Paris", 0), stop("Melun", 42)] }), "Orange");
+
+    expect(layout.ticks.map(({ km }) => km)).toEqual([5, 10, 15, 20, 25, 30, 35, 40]);
   });
 });
