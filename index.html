@@ -52,10 +52,20 @@
         background: var(--bg);
         color: var(--text);
       }
+      footer {
+        max-width: 44rem;
+        margin: 0 auto;
+        padding: 0 1rem 2rem;
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+      footer a {
+        color: inherit;
+      }
       main {
         max-width: 44rem;
         margin: 0 auto;
-        padding: 2rem 1rem 4rem;
+        padding: 2rem 1rem;
       }
       .masthead h1 {
         margin: 0;
@@ -262,6 +272,17 @@
   </head>
   <body>
     <main id="app"></main>
+    <footer>
+      Data:
+      <a href="https://www.data.gouv.fr/datasets/monreseaumobile/">ARCEP</a>
+      (Licence Ouverte),
+      <a href="https://www.data.gouv.fr/datasets/horaires-sncf/">SNCF Voyageurs</a>
+      and
+      <a href="https://www.data.gouv.fr/datasets/vitesse-maximale-nominale-sur-ligne/"
+        >SNCF Réseau</a
+      >
+      (ODbL).
+    </footer>
     <script type="module" src="/src/web/main.ts"></script>
   </body>
 </html>
