@@ -17,6 +17,8 @@
         --accent-soft: #e8ecfd;
         --danger: #b42318;
         --danger-soft: #fdecea;
+        --warning: #8a5a00;
+        --warning-soft: #fef4e2;
         font-family:
           "Inter",
           system-ui,
@@ -38,6 +40,8 @@
           --accent-soft: #252c48;
           --danger: #f97066;
           --danger-soft: #3a1d1d;
+          --warning: #f5b83d;
+          --warning-soft: #33280f;
         }
       }
       * {
@@ -174,18 +178,30 @@
         font-weight: 600;
       }
       #message.error {
+        --tone: var(--danger);
+        --tone-soft: var(--danger-soft);
+        --icon: "⚠";
+      }
+      #message.warning {
+        --tone: var(--warning);
+        --tone-soft: var(--warning-soft);
+        --icon: "ⓘ";
+      }
+      #message.error,
+      #message.warning {
         display: flex;
         gap: 0.6rem;
         padding: 0.8rem 1rem;
-        border: 1px solid var(--danger);
+        border: 1px solid var(--tone);
         border-left-width: 4px;
         border-radius: 10px;
-        background: var(--danger-soft);
-        color: var(--danger);
+        background: var(--tone-soft);
+        color: var(--tone);
         font-size: 0.95rem;
       }
-      #message.error::before {
-        content: "⚠";
+      #message.error::before,
+      #message.warning::before {
+        content: var(--icon);
         font-size: 1.1rem;
         line-height: 1.3;
       }
