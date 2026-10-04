@@ -37,3 +37,8 @@ The small extracts in `test/adapters/fixtures/` stay under their source
 licence: the ARCEP extract under the Licence Ouverte, the SNCF extracts under
 the ODbL. Connectivity lines served by the train API are derived from these
 sources, under the same terms.
+
+## Licence
+
+The code is under the [MIT licence](LICENSE). The data keeps its own licences,
+listed above.
