@@ -16,7 +16,7 @@ describe("Loading a prepared train", () => {
     expect(asked).toEqual(["api/trains/6111/2026-10-10"]);
   });
 
-  it("finds nothing when the API is missing and the page itself answers", async () => {
+  it("fails when the page itself answers instead of the API", async () => {
     // Vite, like most static hosts with a fallback, serves index.html with status 200.
     const load = loadPreparedTrain(
       serving("<!doctype html><html></html>", {
@@ -25,7 +25,13 @@ describe("Loading a prepared train", () => {
       }),
     );
 
-    expect(await load("3645", "2026-10-10")).toBeUndefined();
+    await expect(load("3645", "2026-10-10")).rejects.toThrow();
+  });
+
+  it.each([500, 502])("fails when the server answers %i", async (status) => {
+    const load = loadPreparedTrain(serving("Bad Gateway", { status }));
+
+    await expect(load("6111", "2026-10-10")).rejects.toThrow();
   });
 
   it("loads the train the API answers", async () => {
