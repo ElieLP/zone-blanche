@@ -32,25 +32,45 @@ export async function loadGtfsTimetable(directory: string): Promise<GtfsTimetabl
     return stop;
   };
 
+  // Indexed once, keeping no string read from stop_times (the biggest file): V8 keeps a
+  // whole file in memory as long as any substring of it is kept.
+  const tripsById = new Map<string, Trip>();
+  const tripsByTrainNumber = new Map<string, Trip[]>();
+  for (const { trip_id, service_id, trip_headsign } of trips) {
+    const trip: Trip = { serviceId: service_id, calls: [] };
+    tripsById.set(trip_id, trip);
+    const sameNumber = tripsByTrainNumber.get(trip_headsign);
+    if (sameNumber) sameNumber.push(trip);
+    else tripsByTrainNumber.set(trip_headsign, [trip]);
+  }
+  for (const { trip_id, stop_id, stop_sequence } of stopTimes) {
+    tripsById
+      .get(trip_id)
+      ?.calls.push({ sequence: Number(stop_sequence), stop: stopById(stop_id) });
+  }
+  for (const trip of tripsById.values()) trip.calls.sort((a, b) => a.sequence - b.sequence);
+  const runningDates = new Map<string, Set<string>>();
+  for (const { service_id, date, exception_type } of calendarDates) {
+    if (exception_type !== "1") continue;
+    const dates = runningDates.get(service_id) ?? new Set();
+    runningDates.set(service_id, dates.add(date));
+  }
+
   return {
     stopsOf(trainNumber, date) {
       const gtfsDate = date.replaceAll("-", "");
-      const runningServices = new Set(
-        calendarDates
-          .filter((c) => c.date === gtfsDate && c.exception_type === "1")
-          .map((c) => c.service_id),
-      );
-      const trip = trips.find(
-        (t) => t.trip_headsign === trainNumber && runningServices.has(t.service_id),
-      );
-      if (!trip) return undefined;
-      return stopTimes
-        .filter((st) => st.trip_id === trip.trip_id)
-        .sort((a, b) => Number(a.stop_sequence) - Number(b.stop_sequence))
-        .map((st) => stopById(st.stop_id));
+      const trip = tripsByTrainNumber
+        .get(trainNumber)
+        ?.find((t) => runningDates.get(t.serviceId)?.has(gtfsDate));
+      return trip?.calls.map((call) => call.stop);
     },
   };
 }
+
+type Trip = {
+  readonly serviceId: string;
+  readonly calls: { readonly sequence: number; readonly stop: TimetabledStop }[];
+};
 
 /** Reads a plain CSV (no quoted fields) and keeps only the given columns. */
 async function readCsv<Column extends string>(
