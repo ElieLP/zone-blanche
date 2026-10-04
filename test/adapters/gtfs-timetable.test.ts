@@ -16,4 +16,11 @@ describe("GTFS timetable", () => {
       "Marseille Saint-Charles",
     ]);
   });
+
+  it("finds nothing on a date the train does not run", async () => {
+    const timetable = await loadGtfsTimetable(fixture);
+
+    // The feed covers 2026-10-04 to 2027-03-31; 6111 runs every day in it.
+    expect(timetable.stopsOf("6111", "2027-04-01")).toBeUndefined();
+  });
 });
