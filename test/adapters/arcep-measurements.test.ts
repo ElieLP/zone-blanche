@@ -22,4 +22,10 @@ describe("ARCEP on-train measurements", () => {
 
     expect(parseArcepMeasurements(csv).map((m) => m.level)).toEqual(["Weak", "None"]);
   });
+
+  it("ignores measurements taken outside a train", () => {
+    const csv = [header, "routes;48.84484;1;1;2.37549;Orange;INCAR"].join("\n");
+
+    expect(parseArcepMeasurements(csv)).toEqual([]);
+  });
 });

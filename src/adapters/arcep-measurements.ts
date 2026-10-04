@@ -11,9 +11,10 @@ export type ArcepMeasurement = {
 export function parseArcepMeasurements(csv: string): ArcepMeasurement[] {
   const [header = "", ...lines] = csv.trim().split(/\r?\n/);
   const names = header.split(";");
-  return lines.map((line) => {
+  return lines.flatMap((line) => {
     const values = line.split(";");
     const field = (name: string) => values[names.indexOf(name)] ?? "";
+    if (field("situation") !== "INTRAIN") return [];
     return {
       operator: field("operator") as Operator,
       position: {
