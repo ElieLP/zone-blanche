@@ -139,14 +139,16 @@ describe("Webapp", () => {
     expect(root.querySelector("svg")).toBeNull();
   });
 
-  it("says so when the train cannot be loaded", async () => {
+  it("announces a server error when the train cannot be loaded", async () => {
     const root = appWith(async () => {
       throw new SyntaxError("Unexpected token < in JSON");
     });
 
     await ask(root, "6111");
 
-    expect(status(root)).toBe("Could not load train 6111 on 10/10/2026.");
+    expect(status(root)).toBe(
+      "Server error: could not prepare train 6111 on 10/10/2026. Try again later.",
+    );
   });
 
   it("asks for a dd/mm/yyyy date when the date is not one", async () => {

@@ -86,7 +86,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     try {
       shown = await loadTrain(trainNumber, date);
     } catch {
-      message.textContent = `Could not load train ${trainNumber} on ${shownDate}.`;
+      message.textContent = `Server error: could not prepare train ${trainNumber} on ${shownDate}. Try again later.`;
       return;
     }
     if (!shown) {
