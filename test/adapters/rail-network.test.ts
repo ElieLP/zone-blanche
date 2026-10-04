@@ -29,4 +29,15 @@ describe("Rail network", () => {
 
     expect(route.stopsAtKm[1]).toBeCloseTo(KM_PER_DEGREE / 2, 1);
   });
+
+  it("crosses between sections whose ends are less than 200 m apart", () => {
+    const network = buildRailNetwork([
+      section(160, at(0), at(1)),
+      section(160, at(1.001), at(2)), // about 110 m further
+    ]);
+
+    const route = network.routeThrough([at(0), at(2)]);
+
+    expect(route.lengthKm).toBeCloseTo(2 * KM_PER_DEGREE, 0);
+  });
 });
