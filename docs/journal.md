@@ -221,3 +221,15 @@
   Avignon (657 km, no stop) nothing tells where a bad zone is.
 - Next: make bad zones readable (landmarks or km ticks, minimum stretch
   length?), a UI smoke test, Stryker.
+
+## 2026-10-04 — Trains prepared on demand
+
+- Raw data is 100+ MB: too much for the browser, so a backend it is.
+- `npm run serve` loads the raw data once (~3 s), then
+  `GET /api/trains/<number>/<YYYY-MM-DD>` prepares any train (~1 s):
+  200 JSON, 404 if it does not run (or bad path), 500 if preparing fails.
+- `npm run dev` forwards `/api` to it. The offline CLI and `public/data` are gone.
+- Checked on real data: 6111 identical to the CLI output; 3645
+  (Paris Austerlitz → Toulouse line) now shows.
+- Next: serve the built page from the same server (one thing to deploy), then
+  hosting. ~1 s per request is fine for now; cache if it matters.
