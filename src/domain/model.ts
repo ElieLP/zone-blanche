@@ -1,4 +1,6 @@
-export type Operator = "Orange" | "SFR" | "Bouygues" | "Free";
+export const OPERATORS = ["Orange", "SFR", "Bouygues", "Free"] as const;
+
+export type Operator = (typeof OPERATORS)[number];
 
 export type ConnectivityLevel = "Good" | "Weak" | "None" | "Unknown";
 
