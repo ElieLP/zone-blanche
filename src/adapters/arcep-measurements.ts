@@ -20,7 +20,14 @@ export function parseArcepMeasurements(csv: string): ArcepMeasurement[] {
         latitude: Number(field("latitude_start")),
         longitude: Number(field("longitude_start")),
       },
-      level: "Good",
+      level: levelOf(field("loaded_in_less_5_secondes"), field("loaded_in_less_10_secondes")),
     };
   });
+}
+
+/** Decision 4: under 5 s is Good, under 10 s is Weak, slower or failed is None. */
+function levelOf(loadedIn5s: string, loadedIn10s: string): ArcepMeasurement["level"] {
+  if (loadedIn5s === "1") return "Good";
+  if (loadedIn10s === "1") return "Weak";
+  return "None";
 }
