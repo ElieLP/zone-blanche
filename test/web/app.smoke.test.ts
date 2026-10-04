@@ -130,12 +130,15 @@ describe("Webapp", () => {
     expect(status(root)).toBe("Preparing train 6111 on 10/10/2026…");
   });
 
-  it("says so when the train does not run that day", async () => {
+  it("warns when the train does not run that day, and says what to check", async () => {
     const root = appWith(async () => undefined);
 
     await ask(root, "6111");
 
-    expect(status(root)).toBe("Train 6111 does not run on 10/10/2026.");
+    expect(status(root)).toBe(
+      "Train 6111 does not run on 10/10/2026. Check the train number and the date.",
+    );
+    expect(root.querySelector("[role=status]")?.className).toBe("warning");
     expect(root.querySelector("svg")).toBeNull();
   });
 

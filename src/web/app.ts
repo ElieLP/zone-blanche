@@ -55,13 +55,10 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
 
   let shown: PreparedTrain | undefined;
 
-  const say = (text: string): void => {
+  /** Shows a message; a warning when nothing was found, an error when something failed. */
+  const say = (text: string, tone?: "warning" | "error"): void => {
     message.textContent = text;
-    message.classList.remove("error");
-  };
-  const fail = (text: string): void => {
-    say(text);
-    message.classList.add("error");
+    message.className = tone ?? "";
   };
 
   const draw = (): void => {
@@ -89,7 +86,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     line.innerHTML = "";
     compare();
     if (!date) {
-      fail("Enter the date as dd/mm/yyyy.");
+      say("Enter the date as dd/mm/yyyy.", "error");
       return;
     }
     const shownDate = formatFrenchDate(date);
@@ -97,13 +94,17 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     try {
       shown = await loadTrain(trainNumber, date);
     } catch {
-      fail(
+      say(
         `Server error: could not prepare train ${trainNumber} on ${shownDate}. Try again later.`,
+        "error",
       );
       return;
     }
     if (!shown) {
-      say(`Train ${trainNumber} does not run on ${shownDate}.`);
+      say(
+        `Train ${trainNumber} does not run on ${shownDate}. Check the train number and the date.`,
+        "warning",
+      );
       return;
     }
     compare();
