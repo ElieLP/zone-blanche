@@ -19,3 +19,28 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  deploy:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: production
+    environment:
+      name: production
+      url: https://${{ vars.DOMAIN }}
+    steps:
+      - name: Trust the server
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+      - name: Deploy this commit
+        run: ssh deploy@${{ vars.DEPLOY_HOST }} /srv/zone-blanche/scripts/deploy.sh ${{ github.sha }}
+      - name: Check the site answers
+        run: |
+          for attempt in $(seq 1 30); do
+            curl --fail --silent --output /dev/null "https://${{ vars.DOMAIN }}/" && exit 0
+            sleep 5
+          done
+          exit 1

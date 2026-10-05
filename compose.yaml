@@ -1,0 +1,28 @@
+# Production on the Vultr server: the app behind Caddy, which serves HTTPS for $DOMAIN.
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+    mem_limit: 600m
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  caddy_data:
+  caddy_config:
