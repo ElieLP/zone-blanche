@@ -262,3 +262,17 @@
   ~1 s per train, same output.
 - Watch: a bigger yearly ARCEP file could exceed the 256 MB cap (the API then
   fails at startup, loudly).
+
+## 2026-10-05 — Deployment pipeline
+
+- One server for everything: `/api/` is the train API, the rest is the built
+  page (`dist/`, path traversal refused). The server is bundled to one JS file
+  (`npm run build`, `npm start`).
+- Docker image: open data downloaded at build, lint/typecheck/tests run inside
+  the build. Under a 512 MB limit it uses ~235 MB.
+- Hosting: Koyeb's free tier is closed to new accounts (2026), so Render free
+  (512 MB, 0.1 CPU, sleeps after 15 min idle). `render.yaml`, auto-deploy once
+  GitHub Actions CI passes.
+- At 0.1 CPU: ~80 s to load the data, 10–15 s per train (vs ~3.5 s and ~1 s
+  locally). Next: precompute at build time to cut startup, speed up the
+  per-train work.

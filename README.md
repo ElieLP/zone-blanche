@@ -19,6 +19,13 @@ the API on one port (`PORT`, 3000 by default).
 
 `npm test` runs the tests; `npm run typecheck` and `npm run lint` check the rest.
 
+## Deployment
+
+Every push to `main` runs lint, typecheck, tests and build on GitHub Actions
+(`.github/workflows/ci.yml`). Once they pass, Render rebuilds the Docker image
+(which downloads the open data and runs the checks again) and deploys it, as
+declared in `render.yaml` (free plan, Frankfurt).
+
 ## How it works
 
 The train's stops come from the SNCF timetable, its track from the SNCF Réseau
