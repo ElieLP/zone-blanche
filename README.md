@@ -21,10 +21,12 @@ the API on one port (`PORT`, 3000 by default).
 
 ## Deployment
 
-Every push to `main` runs lint, typecheck, tests and build on GitHub Actions
-(`.github/workflows/ci.yml`). Once they pass, Render rebuilds the Docker image
-(which downloads the open data and runs the checks again) and deploys it, as
-declared in `render.yaml` (free plan, Frankfurt).
+Live at <https://zone-blanche.eg-infra.work>. Every push to `main` runs lint,
+typecheck, tests and build on GitHub Actions (`.github/workflows/ci.yml`).
+Once they pass, the deploy job connects to the Vultr server with a key that
+may only run `scripts/deploy.sh`, which checks out that commit and rebuilds
+the Docker image (`compose.yaml`: the app behind Caddy for HTTPS, Cloudflare
+in front). The job then checks the server answers a train.
 
 ## How it works
 

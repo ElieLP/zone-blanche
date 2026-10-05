@@ -276,3 +276,11 @@
 - At 0.1 CPU: ~80 s to load the data, 10–15 s per train (vs ~3.5 s and ~1 s
   locally). Next: precompute at build time to cut startup, speed up the
   per-train work.
+- Changed host: a Vultr free-tier server (1 vCPU, 458 MB, Debian 13) with
+  2 GB swap, rather than Render. Docker Compose runs the app behind Caddy
+  (Let's Encrypt), Cloudflare proxies `zone-blanche.eg-infra.work`.
+- Deploy job: SSH with a key forced to `scripts/deploy.sh <sha>` (only commits
+  on main), image built on the server (open data layer cached), then a check
+  of `/api/trains/6111/<today>` straight on the server: Cloudflare challenges
+  CI runners. First deploy ~4 min, later ones ~1 min.
+- On the server: app ~160 MB, loads in ~20 s, a train in ~2 s.
