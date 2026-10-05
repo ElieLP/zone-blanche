@@ -37,10 +37,15 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
       - name: Deploy this commit
         run: ssh deploy@${{ vars.DEPLOY_HOST }} /srv/zone-blanche/scripts/deploy.sh ${{ github.sha }}
-      - name: Check the site answers
+      - name: Check the server answers a train
+        # Straight to the server (Cloudflare may challenge CI runners), with its real certificate.
         run: |
+          site="https://${{ vars.DOMAIN }}"
+          resolve="${{ vars.DOMAIN }}:443:${{ vars.DEPLOY_HOST }}"
           for attempt in $(seq 1 30); do
-            curl --fail --silent --output /dev/null "https://${{ vars.DOMAIN }}/" && exit 0
+            status=$(curl --silent --output /dev/null --write-out '%{http_code}' --resolve "$resolve" "$site/api/trains/6111/$(date +%F)" || true)
+            echo "Attempt $attempt: $status"
+            [ "$status" = 200 ] || [ "$status" = 404 ] && exit 0
             sleep 5
           done
           exit 1
