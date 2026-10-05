@@ -14,6 +14,9 @@ npm run serve              # train API on :3000 (loads the data once, ~3 s)
 npm run dev                # the page, forwarding /api to the train API
 ```
 
+In production, `npm run build` then `npm run serve` answers both the page and
+the API on one port (`PORT`, 3000 by default).
+
 `npm test` runs the tests; `npm run typecheck` and `npm run lint` check the rest.
 
 ## How it works
