@@ -13,7 +13,8 @@
     "prepare": "git config core.hooksPath .githooks",
     "serve": "node --max-old-space-size=256 --import tsx src/server/main.ts",
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build && vite build --ssr src/server/main.ts --outDir dist-server",
+    "start": "node --max-old-space-size=256 dist-server/main.js"
   },
   "devDependencies": {
     "@types/node": "^24.19.1",
