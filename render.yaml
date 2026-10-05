@@ -1,0 +1,9 @@
+# Render blueprint: production, deployed on every push to main once CI passes.
+services:
+  - type: web
+    name: zone-blanche
+    runtime: docker
+    plan: free
+    region: frankfurt
+    autoDeployTrigger: checksPass
+    healthCheckPath: /
