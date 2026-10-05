@@ -5,7 +5,8 @@
 set -eu
 
 main() {
-  commit="${1:-${SSH_ORIGINAL_COMMAND##* }}"
+  requested="${SSH_ORIGINAL_COMMAND:-}"
+  commit="${1:-${requested##* }}"
   case "$commit" in
     "" | *[!0-9a-f]*)
       echo "Usage: deploy.sh <commit sha>" >&2
