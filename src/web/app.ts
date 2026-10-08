@@ -16,9 +16,18 @@ const LEVEL_COLOURS: Record<ConnectivityLevel, string> = {
   None: "#c8423b",
   Unknown: "#b7beca",
 };
+const LEVEL_LABELS: Record<ConnectivityLevel, string> = {
+  Good: "Bon réseau",
+  Weak: "Réseau faible",
+  None: "Pas de réseau",
+  Unknown: "Inconnu",
+};
 
 const LEGEND = `<p class="legend">${Object.entries(LEVEL_COLOURS)
-  .map(([level, colour]) => `<span><i style="background:${colour}"></i>${level}</span>`)
+  .map(
+    ([level, colour]) =>
+      `<span><i style="background:${colour}"></i>${LEVEL_LABELS[level as ConnectivityLevel]}</span>`,
+  )
   .join("")}</p>`;
 
 /** Finds the prepared data of a train on a date, if there is any. */
@@ -28,17 +37,17 @@ export type TrainLoader = (trainNumber: string, date: string) => Promise<Prepare
 export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: string): void {
   root.innerHTML = `
   <header class="masthead">
-    <h1>Train connectivity</h1>
-    <p>Mobile coverage along a French train journey, from ARCEP's on-board measurements.</p>
+    <h1>Zone blanche</h1>
+    <p>La couverture mobile le long d'un trajet en train, d'après les mesures embarquées de l'ARCEP.</p>
   </header>
   <form id="request" class="card">
     <div class="fields">
-      <label class="field"><span>Train number</span><input id="train" name="train" placeholder="e.g. 6111" inputmode="numeric" autocomplete="off" required /></label>
-      <label class="field"><span>Date</span><input id="date" name="date" value="${formatFrenchDate(today)}" placeholder="dd/mm/yyyy" inputmode="numeric" required /></label>
-      <button>Show coverage</button>
+      <label class="field"><span>Numéro de train</span><input id="train" name="train" placeholder="ex. 6111" inputmode="numeric" autocomplete="off" required /></label>
+      <label class="field"><span>Date</span><input id="date" name="date" value="${formatFrenchDate(today)}" placeholder="jj/mm/aaaa" inputmode="numeric" required /></label>
+      <button>Voir la couverture</button>
     </div>
     <fieldset class="operators">
-      <legend>Operator</legend>
+      <legend>Opérateur</legend>
       ${OPERATORS.map(
         (o, i) =>
           `<label><input type="radio" name="operator" value="${o}" ${i === 0 ? "checked" : ""} /><span class="name">${o}</span><span class="share" data-operator="${o}"></span></label>`,
@@ -66,7 +75,7 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     const operator = String(new FormData(form).get("operator")) as Operator;
     const lengthKm = Math.round(shown.stops.at(-1)?.atKm ?? 0);
     say(
-      `Train ${shown.trainNumber} on ${formatFrenchDate(shown.date)} with ${operator}, ${lengthKm} km.`,
+      `Train ${shown.trainNumber} du ${formatFrenchDate(shown.date)} avec ${operator}, ${lengthKm} km.`,
     );
     line.innerHTML = LEGEND + svgOf(layOut(shown, operator));
   };
@@ -86,23 +95,23 @@ export function startApp(root: HTMLElement, loadTrain: TrainLoader, today: strin
     line.innerHTML = "";
     compare();
     if (!date) {
-      say("Enter the date as dd/mm/yyyy.", "error");
+      say("Saisissez la date au format jj/mm/aaaa.", "error");
       return;
     }
     const shownDate = formatFrenchDate(date);
-    say(`Preparing train ${trainNumber} on ${shownDate}…`);
+    say(`Préparation du train ${trainNumber} du ${shownDate}…`);
     try {
       shown = await loadTrain(trainNumber, date);
     } catch {
       say(
-        `Server error: could not prepare train ${trainNumber} on ${shownDate}. Try again later.`,
+        `Erreur du serveur : impossible de préparer le train ${trainNumber} du ${shownDate}. Réessayez plus tard.`,
         "error",
       );
       return;
     }
     if (!shown) {
       say(
-        `Train ${trainNumber} does not run on ${shownDate}. Check the train number and the date.`,
+        `Le train ${trainNumber} ne circule pas le ${shownDate}. Vérifiez le numéro du train et la date.`,
         "warning",
       );
       return;
@@ -127,7 +136,7 @@ function shareOf(share: CoverageShare): string {
         `<i style="flex-grow:${part};background:${LEVEL_COLOURS[level as ConnectivityLevel]}"></i>`,
     )
     .join("");
-  return `<span class="bar">${bar}</span>${Math.round(share.Good * 100)}% good`;
+  return `<span class="bar">${bar}</span>${Math.round(share.Good * 100)}\u00a0% bon réseau`;
 }
 
 function svgOf({ stops, stretches, ticks }: LineLayout): string {
@@ -142,7 +151,7 @@ function svgOf({ stops, stretches, ticks }: LineLayout): string {
   const bars = stretches
     .map(
       ({ from, to, level }) =>
-        `<rect x="${BAR_X}" y="${y(from)}" width="${BAR_WIDTH}" height="${y(to) - y(from)}" fill="${LEVEL_COLOURS[level]}"><title>${level}</title></rect>`,
+        `<rect x="${BAR_X}" y="${y(from)}" width="${BAR_WIDTH}" height="${y(to) - y(from)}" fill="${LEVEL_COLOURS[level]}"><title>${LEVEL_LABELS[level]}</title></rect>`,
     )
     .join("");
   const markers = stops
@@ -153,7 +162,7 @@ function svgOf({ stops, stretches, ticks }: LineLayout): string {
     )
     .join("");
   const track = `<clipPath id="track"><rect x="${BAR_X}" y="${MARGIN}" width="${BAR_WIDTH}" height="${LINE_HEIGHT}" rx="${BAR_WIDTH / 2}" /></clipPath>`;
-  return `<svg viewBox="0 0 ${WIDTH} ${LINE_HEIGHT + 2 * MARGIN}" role="img" aria-label="Connectivity along the line">${track}${marks}<g clip-path="url(#track)">${bars}</g>${markers}</svg>`;
+  return `<svg viewBox="0 0 ${WIDTH} ${LINE_HEIGHT + 2 * MARGIN}" role="img" aria-label="Couverture le long de la ligne">${track}${marks}<g clip-path="url(#track)">${bars}</g>${markers}</svg>`;
 }
 
 function escape(text: string): string {

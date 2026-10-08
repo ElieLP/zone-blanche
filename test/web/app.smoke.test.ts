@@ -68,7 +68,7 @@ describe("Webapp", () => {
     await ask(root, "6111");
 
     expect(asked).toEqual([["6111", "2026-10-10"]]);
-    expect(status(root)).toBe("Train 6111 on 10/10/2026 with Orange, 750 km.");
+    expect(status(root)).toBe("Train 6111 du 10/10/2026 avec Orange, 750 km.");
     const svg = root.querySelector("svg");
     expect([...(svg?.querySelectorAll("text.stop-name") ?? [])].map((t) => t.textContent)).toEqual([
       "Paris Gare de Lyon Hall 1 - 2",
@@ -76,8 +76,8 @@ describe("Webapp", () => {
       "Marseille Saint-Charles",
     ]);
     expect([...(svg?.querySelectorAll("rect title") ?? [])].map((t) => t.textContent)).toEqual([
-      "Good",
-      "None",
+      "Bon réseau",
+      "Pas de réseau",
     ]);
   });
 
@@ -93,9 +93,9 @@ describe("Webapp", () => {
     sfr.checked = true;
     sfr.dispatchEvent(new Event("change", { bubbles: true }));
 
-    expect(status(root)).toBe("Train 6111 on 10/10/2026 with SFR, 750 km.");
+    expect(status(root)).toBe("Train 6111 du 10/10/2026 avec SFR, 750 km.");
     expect([...root.querySelectorAll("svg rect title")].map((t) => t.textContent)).toEqual([
-      "Weak",
+      "Réseau faible",
     ]);
     expect(loads).toBe(1);
   });
@@ -115,10 +115,10 @@ describe("Webapp", () => {
     await ask(root, "6111");
 
     expect([...root.querySelectorAll(".operators label")].map((l) => l.textContent)).toEqual([
-      "Orange80% good",
-      "SFR0% good",
-      "Bouygues0% good",
-      "Free100% good",
+      "Orange80\u00a0% bon réseau",
+      "SFR0\u00a0% bon réseau",
+      "Bouygues0\u00a0% bon réseau",
+      "Free100\u00a0% bon réseau",
     ]);
   });
 
@@ -127,7 +127,7 @@ describe("Webapp", () => {
 
     void ask(root, "6111");
 
-    expect(status(root)).toBe("Preparing train 6111 on 10/10/2026…");
+    expect(status(root)).toBe("Préparation du train 6111 du 10/10/2026…");
   });
 
   it("warns when the train does not run that day, and says what to check", async () => {
@@ -136,7 +136,7 @@ describe("Webapp", () => {
     await ask(root, "6111");
 
     expect(status(root)).toBe(
-      "Train 6111 does not run on 10/10/2026. Check the train number and the date.",
+      "Le train 6111 ne circule pas le 10/10/2026. Vérifiez le numéro du train et la date.",
     );
     expect(root.querySelector("[role=status]")?.className).toBe("warning");
     expect(root.querySelector("svg")).toBeNull();
@@ -150,7 +150,7 @@ describe("Webapp", () => {
     await ask(root, "6111");
 
     expect(status(root)).toBe(
-      "Server error: could not prepare train 6111 on 10/10/2026. Try again later.",
+      "Erreur du serveur : impossible de préparer le train 6111 du 10/10/2026. Réessayez plus tard.",
     );
   });
 
@@ -181,7 +181,7 @@ describe("Webapp", () => {
 
     await ask(root, "6111", "2026-10-10");
 
-    expect(status(root)).toBe("Enter the date as dd/mm/yyyy.");
+    expect(status(root)).toBe("Saisissez la date au format jj/mm/aaaa.");
     expect(root.querySelector("svg")).toBeNull();
     expect(loads).toBe(0);
   });
