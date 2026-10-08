@@ -20,10 +20,10 @@ main() {
     exit 65
   }
   git reset --quiet --hard "$commit"
-  # The build cache outgrows the small disk; keep the recent part (the open data stage).
-  docker builder prune --force --keep-storage 1GB >/dev/null
   docker compose up --detach --build --remove-orphans
   docker image prune --force >/dev/null
+  # Keep only the cache this build used (the open data among it): the disk is small.
+  docker builder prune --force --filter until=1h >/dev/null
 }
 
 main "$@"

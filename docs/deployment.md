@@ -103,6 +103,10 @@ All on the server, in `/srv/zone-blanche`, as `deploy` (`su deploy`) or root.
 - **Memory**: the app was cut from 1.2 GB to ~0.5 GB peak (see the journal,
   "Memory below 512 MB"). `node --max-old-space-size=256` in the image is part
   of that: removing it makes V8 grow past the server's RAM while loading.
+- **Disk full** ("no space left on device" while exporting the image): old
+  build cache piles up (each new `node:24-slim` re-downloads the open data).
+  `deploy.sh` prunes the cache not used by the last build; by hand:
+  `docker builder prune --force --filter until=1h`, then `df -h /`.
 - **`npm ci` in Docker** needs `--ignore-scripts`: the `prepare` script calls
   `git`, absent from the image.
 - **Hosting history**: Koyeb's free tier is closed to new accounts (2026);
