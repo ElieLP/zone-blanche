@@ -17,10 +17,10 @@ const LEVEL_COLOURS: Record<ConnectivityLevel, string> = {
   Unknown: "#b7beca",
 };
 const LEVEL_LABELS: Record<ConnectivityLevel, string> = {
-  Good: "Bon réseau",
-  Weak: "Réseau faible",
-  None: "Pas de réseau",
-  Unknown: "Inconnu",
+  Good: "Bonne couverture",
+  Weak: "Couverture faible",
+  None: "Aucune couverture",
+  Unknown: "Inconnue",
 };
 
 const LEGEND = `<p class="legend">${Object.entries(LEVEL_COLOURS)

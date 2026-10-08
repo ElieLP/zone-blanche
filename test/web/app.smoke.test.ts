@@ -76,8 +76,8 @@ describe("Webapp", () => {
       "Marseille Saint-Charles",
     ]);
     expect([...(svg?.querySelectorAll("rect title") ?? [])].map((t) => t.textContent)).toEqual([
-      "Bon réseau",
-      "Pas de réseau",
+      "Bonne couverture",
+      "Aucune couverture",
     ]);
   });
 
@@ -95,7 +95,7 @@ describe("Webapp", () => {
 
     expect(status(root)).toBe("Train 6111 du 10/10/2026 avec SFR, 750 km.");
     expect([...root.querySelectorAll("svg rect title")].map((t) => t.textContent)).toEqual([
-      "Réseau faible",
+      "Couverture faible",
     ]);
     expect(loads).toBe(1);
   });
