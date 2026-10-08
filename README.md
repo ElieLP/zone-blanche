@@ -26,7 +26,8 @@ typecheck, tests and build on GitHub Actions (`.github/workflows/ci.yml`).
 Once they pass, the deploy job connects to the Vultr server with a key that
 may only run `scripts/deploy.sh`, which checks out that commit and rebuilds
 the Docker image (`compose.yaml`: the app behind Caddy for HTTPS, Cloudflare
-in front). The job then checks the server answers a train.
+in front). The job then checks the server answers a train. Details, server
+setup and operations: [`docs/deployment.md`](docs/deployment.md).
 
 ## How it works
 
