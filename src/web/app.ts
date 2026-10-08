@@ -136,7 +136,7 @@ function shareOf(share: CoverageShare): string {
         `<i style="flex-grow:${part};background:${LEVEL_COLOURS[level as ConnectivityLevel]}"></i>`,
     )
     .join("");
-  return `<span class="bar">${bar}</span>${Math.round(share.Good * 100)}\u00a0% bon réseau`;
+  return `<span class="bar">${bar}</span>${Math.round(share.Good * 100)}\u00a0% bien couvert`;
 }
 
 function svgOf({ stops, stretches, ticks }: LineLayout): string {

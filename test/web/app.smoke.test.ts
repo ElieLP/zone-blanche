@@ -115,10 +115,10 @@ describe("Webapp", () => {
     await ask(root, "6111");
 
     expect([...root.querySelectorAll(".operators label")].map((l) => l.textContent)).toEqual([
-      "Orange80\u00a0% bon réseau",
-      "SFR0\u00a0% bon réseau",
-      "Bouygues0\u00a0% bon réseau",
-      "Free100\u00a0% bon réseau",
+      "Orange80\u00a0% bien couvert",
+      "SFR0\u00a0% bien couvert",
+      "Bouygues0\u00a0% bien couvert",
+      "Free100\u00a0% bien couvert",
     ]);
   });
 
